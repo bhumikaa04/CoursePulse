@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import "../styles/FormCSS.css";
 
 function Login() {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const navigate = useNavigate();
 
+    // Handling input changes
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -13,53 +15,53 @@ function Login() {
         });
     };
 
+    // Email validation function
     const validateEmail = (email) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return regex.test(email);
     };
 
-    const handleSubmit = (e) => {
+    // Form submit handler
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!validateEmail(formData.email)) {
-            alert('Please enter a valid email address');
+            alert("Please enter a valid email address");
             return;
         }
 
         if (formData.password.length < 6) {
-            alert('Password must be at least 6 characters long');
+            alert("Password must be at least 6 characters long");
             return;
         }
 
-        axios.post('http://localhost:3001/login', formData)
-            .then(res => {
-                if (res.data.token) {
-                    localStorage.setItem('token', res.data.token); // Store JWT in localStorage
-                    alert('Login successful!');
-                    navigate('/dashboard'); // Redirect to home page
-                } else {
-                    alert('Login failed: No token received');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                if (err.response) {
-                    if (err.response.status === 401) {
-                        alert('Login failed: Invalid email or password');
-                    } else {
-                        alert('Login failed: Server error');
-                    }
-                } else if (err.request) {
-                    alert('Login failed: No response from server');
-                } else {
-                    alert('Login failed: An error occurred');
+        try {
+            const response = await axios.post("http://localhost:3001/login", formData, {
+                headers: {
+                    "Content-Type": "application/json"
                 }
             });
+
+            console.log("Response:", response.data);
+
+            if (response.data.token) {
+                localStorage.setItem("token", response.data.token); // Store token
+                alert("Login successful!");
+                navigate("/dashboard"); // Redirect to Dashboard
+            } else {
+                alert("Login failed: No token received");
+            }
+        } catch (error) {
+            console.error("Error Response:", error.response);
+            alert("Login failed: Invalid credentials or server error");
+        }
     };
 
     return (
-        <div className="container mt-4">
+        <div className="container mt-5 col-md-4">
+            <div className="heading">
             <h1 className="text-center">Login</h1>
+            </div>
             <div className="card p-4 shadow-sm">
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
@@ -88,11 +90,15 @@ function Login() {
                             required
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary w-100">Login</button>
+                    <button type="submit" className="btn btn-primary w-100">
+                        Login
+                    </button>
                 </form>
                 <div className="text-center mt-3">
                     <p>Don't have an account?</p>
-                    <Link to="/signup" className="btn btn-secondary">Signup</Link>
+                    <Link to="/signup" className="btn btn-secondary">
+                        Signup
+                    </Link>
                 </div>
             </div>
         </div>

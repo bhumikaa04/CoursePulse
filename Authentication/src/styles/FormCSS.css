@@ -1,0 +1,100 @@
+/* Reset default body margin and padding */
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scrollbars */
+}
+
+/* Center the container vertically and horizontally */
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    height: 100vh; /* Full viewport height */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+}
+
+/* Card styling */
+.card {
+    width: 100%;
+    max-width: 400px; /* Adjust as needed */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff; /* White background */
+    margin-bottom: 20px; /* Add distance between card and bottom */
+}
+
+/* Heading styling */
+.heading h1 {
+    text-align: center;
+    margin: 0; /* Reset default margin */
+    margin-top: 50px; /* Add only top margin */
+    font-size: 40px; /* Adjust font size */
+    color: #2C3E50; /* Dark blue */
+}
+
+/* Form styling */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between form elements */
+}
+
+/* Form input styling */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #BDC3C7; /* Silver border */
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: #2C3E50; /* Dark blue on focus */
+    outline: none;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #2C3E50; /* Dark blue */
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    color: #ffffff; /* White text */
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #1A252F; /* Darker blue */
+}
+
+/* Signup link styling */
+.btn-secondary {
+    background-color: #BDC3C7; /* Silver */
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    color: #2C3E50; /* Dark blue text */
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #95A5A6; /* Darker silver */
+}
+
+/* Text center alignment */
+.text-center {
+    text-align: center;
+}
+
+/* Margin for the "Don't have an account?" text */
+.text-center p {
+    margin: 0; /* Reset default margin */
+    margin-bottom: 10px; /* Add only bottom margin */
+}
