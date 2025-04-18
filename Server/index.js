@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const authenticateToken = require('./authMiddleware');
 require('dotenv').config();
 const Router = express.Router;
-const Course = require('./model/CourseSchema'); // Assuming you have a Course model defined in courseDetail.js
+const Course = require('./model/CourseSchema'); 
 
 
 const app = express();
