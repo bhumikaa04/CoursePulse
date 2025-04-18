@@ -2,18 +2,19 @@
 body {
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Prevent scrollbars */
+    font-family: Arial, sans-serif; /* Add a default font */
+    background-color: #f8f9fa; /* Light background color */
 }
 
 /* Center the container vertically and horizontally */
 .container {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Stack children vertically */
     justify-content: center; /* Center vertically */
     align-items: center; /* Center horizontally */
     height: 100vh; /* Full viewport height */
-    margin: 0; /* Remove default margin */
-    padding: 0; /* Remove default padding */
+    padding: 20px; /* Add padding to the container */
+    box-sizing: border-box; /* Include padding in height calculation */
 }
 
 /* Card styling */
@@ -24,15 +25,13 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #ffffff; /* White background */
-    margin-bottom: 20px; /* Add distance between card and bottom */
 }
 
 /* Heading styling */
-.heading h1 {
+h1 {
     text-align: center;
-    margin: 0; /* Reset default margin */
-    margin-top: 50px; /* Add only top margin */
-    font-size: 40px; /* Adjust font size */
+    margin: 0 0 20px 0; /* Add margin below the heading */
+    font-size: 2rem; /* Adjust font size */
     color: #2C3E50; /* Dark blue */
 }
 
@@ -67,6 +66,7 @@ form {
     color: #ffffff; /* White text */
     border-radius: 5px;
     transition: background-color 0.3s;
+    cursor: pointer; /* Add pointer cursor */
 }
 
 .btn-primary:hover {
@@ -82,6 +82,9 @@ form {
     color: #2C3E50; /* Dark blue text */
     border-radius: 5px;
     transition: background-color 0.3s;
+    cursor: pointer; /* Add pointer cursor */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Ensure proper button styling */
 }
 
 .btn-secondary:hover {
@@ -93,7 +96,7 @@ form {
     text-align: center;
 }
 
-/* Margin for the "Don't have an account?" text */
+/* Margin for the "Already have an account?" text */
 .text-center p {
     margin: 0; /* Reset default margin */
     margin-bottom: 10px; /* Add only bottom margin */

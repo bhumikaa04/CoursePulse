@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Signup() {
-    const [formData, setFormData] = useState({ username: "", email: "", password: "" });
+    const [formData, setFormData] = useState({ email: "", password: "" , username: "" });
     const navigate = useNavigate();
 
     // Handling input change
@@ -43,23 +43,10 @@ function Signup() {
     };
 
     return (
-        <div className="container mt-4">
+        <div className="container mt-4 flex row justify-content-center">
             <h1 className="text-center">Signup</h1>
             <div className="card p-4 shadow-sm">
                 <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <label htmlFor="username" className="form-label">Username</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="username"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            placeholder="Enter username"
-                            required
-                        />
-                    </div>
                     <div className="mb-3">
                         <label htmlFor="email" className="form-label">Email address</label>
                         <input
@@ -70,6 +57,19 @@ function Signup() {
                             value={formData.email}
                             onChange={handleChange}
                             placeholder="Enter email"
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label">Username</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="username"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            placeholder="Define Username"
                             required
                         />
                     </div>
@@ -91,9 +91,8 @@ function Signup() {
                     </button>
                 </form>
                 <div className="text-center mt-3">
-                    <p>Already have an account?</p>
-                    <Link to="/login" className="btn btn-secondary">
-                        Login
+                    <Link to="/login" className="hyperlink">
+                        Already have an account?
                     </Link>
                 </div>
             </div>

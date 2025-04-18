@@ -1,0 +1,23 @@
+/* ProfileFormButton.css */
+.profile-button {
+    background-color: #1A252F; /* Dark Blue */
+    color: #ffffff; /* White */
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    margin: 10px 20px;
+  }
+  
+  .profile-button:hover {
+    transform: scale(1.05);
+  }
+  
+  .profile-button:active {
+    background-color: #1A252F;
+  }
+  

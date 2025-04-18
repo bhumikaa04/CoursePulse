@@ -1,0 +1,99 @@
+/* explore.css */
+.explore {
+    text-align: center;
+    padding: 40px;
+    background-color: #FFFFFF; /* Clean background */
+    color: #2C3E50; /* Professional navy blue */
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #2C3E50;
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #BDC3C7; /* Soft gray */
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+}
+
+.search-bar button {
+    background-color: #FF6F61; /* Coral accent */
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-bar button:hover {
+    background-color: #E55B50; /* Slightly darker coral */
+}
+
+/* Course List */
+.course-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.course-card {
+    background-color: #FFFFFF;
+    border: 2px solid #BDC3C7;
+    border-radius: 10px;
+    padding: 20px;
+    width: 280px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.course-card h3 {
+    color: #2C3E50;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.course-card p {
+    color: #7F8C8D; /* Slightly muted gray for description */
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.course-card button {
+    background-color: #FF6F61;
+    color: #FFFFFF;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.course-card button:hover {
+    background-color: #E55B50;
+}
+
+/* Hover Effect */
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+}
+

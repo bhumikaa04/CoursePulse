@@ -1,13 +1,15 @@
-import React from "react";
+import React, {useState} from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import things from "./things";
+import OuterHome from "./OuterHome";
+
 
 function Home() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // State to manage login status
     return (
         <>
-            <Navbar />  
-            <things />
+            <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /> 
+            <OuterHome />
             <Footer />
         </>
     );

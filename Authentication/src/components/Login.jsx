@@ -5,14 +5,17 @@ import "../styles/FormCSS.css";
 
 function Login() {
     const [formData, setFormData] = useState({ email: "", password: "" });
+    const [error, setError] = useState(""); // For displaying error messages
+    const [isLoading, setIsLoading] = useState(false); // For loading state
     const navigate = useNavigate();
 
     // Handling input changes
     const handleChange = (e) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.value,
         });
+        setError(""); // Clear error messages when the user types
     };
 
     // Email validation function
@@ -26,46 +29,54 @@ function Login() {
         e.preventDefault();
 
         if (!validateEmail(formData.email)) {
-            alert("Please enter a valid email address");
+            setError("Please enter a valid email address");
             return;
         }
 
         if (formData.password.length < 6) {
-            alert("Password must be at least 6 characters long");
+            setError("Password must be at least 6 characters long");
             return;
         }
+
+        setIsLoading(true); // Start loading
+        setError(""); // Clear previous errors
 
         try {
             const response = await axios.post("http://localhost:3001/login", formData, {
                 headers: {
-                    "Content-Type": "application/json"
-                }
+                    "Content-Type": "application/json",
+                },
             });
 
             console.log("Response:", response.data);
 
             if (response.data.token) {
                 localStorage.setItem("token", response.data.token); // Store token
-                alert("Login successful!");
                 navigate("/dashboard"); // Redirect to Dashboard
             } else {
-                alert("Login failed: No token received");
+                setError("Login failed: No token received");
             }
         } catch (error) {
             console.error("Error Response:", error.response);
-            alert("Login failed: Invalid credentials or server error");
+            setError(
+                error.response?.data?.message ||
+                "Login failed: Invalid credentials or server error"
+            );
+        } finally {
+            setIsLoading(false); // Stop loading
         }
     };
 
     return (
-        <div className="container mt-5 col-md-4">
-            <div className="heading">
+        <div className="container mt-4 flex row justify-content-center">
             <h1 className="text-center">Login</h1>
-            </div>
             <div className="card p-4 shadow-sm">
+                {error && <div className="alert alert-danger">{error}</div>}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
-                        <label htmlFor="email" className="form-label">Email address</label>
+                        <label htmlFor="email" className="form-label">
+                            Email address
+                        </label>
                         <input
                             type="email"
                             className="form-control"
@@ -78,7 +89,9 @@ function Login() {
                         />
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="password" className="form-label">Password</label>
+                        <label htmlFor="password" className="form-label">
+                            Password
+                        </label>
                         <input
                             type="password"
                             className="form-control"
@@ -90,14 +103,17 @@ function Login() {
                             required
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary w-100">
-                        Login
+                    <button
+                        type="submit"
+                        className="btn btn-primary w-100"
+                        disabled={isLoading} // Disable button while loading
+                    >
+                        {isLoading ? "Logging in..." : "Login"}
                     </button>
                 </form>
                 <div className="text-center mt-3">
-                    <p>Don't have an account?</p>
-                    <Link to="/signup" className="btn btn-secondary">
-                        Signup
+                    <Link to="/signup" className="hyperlink">
+                        Don't have an account?
                     </Link>
                 </div>
             </div>

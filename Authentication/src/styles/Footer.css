@@ -4,9 +4,10 @@
     color: #FFFFFF; /* White text */
     padding: 40px 20px;
     text-align: center;
-    position: fixed; /* Stick to the bottom */
+    /* position: fixed; /* Stick to the bottom */
+    /*  
     left: 0;
-    bottom: 0;
+    bottom: 0; */
     width: 100%;
     z-index: 1000; /* Ensure it stays above other content */
 }
@@ -21,7 +22,6 @@
 }
 
 .footer-section {
-    flex: 1;
     min-width: 200px;
     margin-bottom: 20px;
 }
