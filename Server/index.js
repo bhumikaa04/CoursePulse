@@ -6,8 +6,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authenticateToken = require('./authMiddleware');
 require('dotenv').config();
+<<<<<<< HEAD
 const Course = require('./model/CourseSchema'); 
 const profileModel = require('./model/ProfileSchema');
+=======
+const Router = express.Router;
+const Course = require('./model/CourseSchema'); 
+
+>>>>>>> 48574c3ee459a2fcb004acb7b31d5bb4a05285bf
 
 const app = express();
 app.use(express.json());
