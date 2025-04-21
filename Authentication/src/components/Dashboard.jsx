@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import EditProfile from "./EditProfile";
+import { AuthContext } from "../context/AuthContext"; // Import the AuthContext
 
 const Dashboard = () => {
+    const {isLoggedIn,  setIsLoggedIn } = useContext(AuthContext); // Accessing the AuthContext to manage login state
     const [user, setUser] = useState(null);
-    const [isLoggedIn, setIsLoggedIn] = useState(true); // Assume the user is logged in initially
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -13,8 +14,7 @@ const Dashboard = () => {
         if (!token) {
             alert("You need to log in first.");
             setIsLoggedIn(false); // Update logged-in state
-            console.log(" Redirecting to login page.");
-            // Redirect to login page if token is not found
+            console.log("Redirecting to login page.");
             navigate("/login");
             return;
         }
@@ -31,6 +31,8 @@ const Dashboard = () => {
             })
             .then((data) => {
                 console.log("Welcome to the dashboard");
+                setIsLoggedIn(true); // Update logged-in state`
+                console.log("User data:", data.user); // Debugging
                 if (data?.user) {
                     setUser(data.user);
                 } else {
@@ -44,12 +46,12 @@ const Dashboard = () => {
                 setIsLoggedIn(false); // Update logged-in state
                 navigate("/login");
             });
-    }, [navigate]);
+    }, [navigate, setIsLoggedIn]);
 
     return (
         <>
             {/* Pass isLoggedIn to Navbar */}
-            <Navbar isLoggedIn={isLoggedIn} />
+            <Navbar isLoggedIn={!!user} />
             <div className="container mt-4">
                 <h1 className="text-center">Dashboard</h1>
                 <div className="card p-4 shadow-sm">
@@ -58,6 +60,7 @@ const Dashboard = () => {
                             <h2>Welcome, {user.username}!</h2>
                             <p>Email: {user.email}</p>
                             <EditProfile />
+                            <br />
                         </div>
                     ) : (
                         <p>Loading user data...</p>

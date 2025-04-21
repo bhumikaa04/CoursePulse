@@ -1,11 +1,14 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState , useContext} from "react";
+import { Link , useParams } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa"; // Profile Icon
 import "../styles/style.css";
 import LogoutButton from "./Logout"; // Import the LogoutButton component
+import { AuthContext } from "../context/AuthContext";
 
-const Navbar = ({ isLoggedIn , setIsLoggedIn }) => {
+const Navbar = () => {
+    const { isLoggedIn , setIsLoggedIn } = useContext(AuthContext);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const { username } = useParams(); // Get username from the route params
 
     return (
         <nav className="navbar">
@@ -60,10 +63,10 @@ const Navbar = ({ isLoggedIn , setIsLoggedIn }) => {
                         {isDropdownOpen && (
                           <ul className="dropdown-menu">
                             <li>
-                              <Link to="/profile">View Profile</Link>
+                              <Link to={`/profile/${username}`}>View Profile</Link>
                             </li>
                             <li>
-                              <LogoutButton setIsLoggedIn={setIsLoggedIn} />
+                              <LogoutButton />
                             </li>
                           </ul>
                         )}

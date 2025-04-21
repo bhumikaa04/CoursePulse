@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState , useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/FormCSS.css";
+import { AuthContext } from "../context/AuthContext";
 
 function Login() {
+    const { setIsLoggedIn } = useContext(AuthContext); // Accessing the AuthContext to manage login state
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [error, setError] = useState(""); // For displaying error messages
     const [isLoading, setIsLoading] = useState(false); // For loading state
@@ -48,10 +50,19 @@ function Login() {
                 },
             });
 
+            axios.post('http://localhost:3001/login', {
+                username: userInput.username,
+                password: userInput.password,
+              })
+              .then(response => console.log(response))
+              .catch(error => console.error(error));
+
             console.log("Response:", response.data);
 
             if (response.data.token) {
                 localStorage.setItem("token", response.data.token); // Store token
+                setIsLoggedIn(true); // Update login state
+                alert("Login successful!"); // Show success message
                 navigate("/dashboard"); // Redirect to Dashboard
             } else {
                 setError("Login failed: No token received");

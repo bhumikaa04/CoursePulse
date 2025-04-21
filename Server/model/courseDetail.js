@@ -6,23 +6,15 @@
 //         unique : true , 
 //         required: true
 //     },
-//     creationDate: {
-//         type: Date,
-//         required: true
-//     },
-//     lastUpdate: {
-//         type: Date,
-//         required: true
-//     },
-//     courseDescription: {
-//         type: String,
-//         required: true
-//     },
 //     courseCategory: {
 //         type: String,
 //         required: true
 //     },
-//     courseTopic: {
+//     courseURL: {
+//         type: String,
+//         required: true   
+//     },
+//     courseDescription: {
 //         type: String,
 //         required: true
 //     },
