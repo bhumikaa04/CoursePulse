@@ -15,8 +15,8 @@ function LogoutButton() {
     //     navigate("/login"); // Redirect to the login page
     // };
     
-    console.log("setIsLoggedIn:", setIsLoggedIn); // Debug the prop
-    console.log("LogoutButton Props:", { setIsLoggedIn }); // Debugging
+    // console.log("setIsLoggedIn:", setIsLoggedIn); // Debug the prop
+    // console.log("LogoutButton Props:", { setIsLoggedIn }); // Debugging
 
 
     const handleLogout = () => {

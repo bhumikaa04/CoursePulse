@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useContext } from 'react';
 import '../styles/CourseCreator.css'; // Assuming you have a CSS file for styling
+import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
+
 
 const CourseCreator = () => {
+  const { user } = useContext(AuthContext); // From your auth provider
   const [courses, setCourses] = useState([
     { id: 1, title: 'Web Development Fundamentals', contents: [] },
     { id: 2, title: 'Graphic Design Basics', contents: [] },
@@ -24,29 +27,105 @@ const CourseCreator = () => {
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
+  const handleSaveCourse = async () => {
+    try {
+      if (!user || !user.email) {
+        throw new Error('User is not authenticated or email is missing.');
+      }
+      const response = await fetch('/create-course/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          course: selectedCourse,
+          userEmail: user.email  // Get from auth context
+        })
+      });
+  
+      if (!response.ok) throw new Error('Failed to save course');
+      
+      const savedCourse = await response.json();
+      
+      // Update both courses list AND selected course
+      setCourses(prevCourses => 
+        prevCourses.map(c => 
+          c.id === selectedCourse.id ? { ...savedCourse, id: savedCourse._id } : c
+        )
+      );
+      
+      setSelectedCourse({ ...savedCourse, id: savedCourse._id });
+    } catch (err) {
+      console.error('Save error:', err);
+    }
+  };
+
   useEffect(() => {
-    if (newContent.type === 'video' && newContent.url.includes('youtube.com')) {
-      const videoId = getYouTubeId(newContent.url);
-      if (videoId) {
-        setThumbnailLoading(true);
+    let isMounted = true; // Flag to prevent state updates if component unmounts
+
+    console.log('User object:', user); // Debugging: Check if user is available
+  
+    const fetchYouTubeThumbnail = async (url) => {
+      try {
+        const videoId = getYouTubeId(url);
+        if (!videoId) return '';
+        
+        // Test if thumbnail exists
         const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
-        setNewContent(prev => ({
-          ...prev,
-          thumbnail: thumbnailUrl
-        }));
-        setThumbnailLoading(false);
-      } else {
+        const response = await fetch(thumbnailUrl);
+        
+        if (response.ok) {
+          return thumbnailUrl;
+        }
+        return '';
+      } catch (error) {
+        console.error('Error checking YouTube thumbnail:', error);
+        return '';
+      }
+    };
+  
+    const updateThumbnail = async () => {
+      if (newContent.type === 'video' && newContent.url.includes('youtube.com')) {
+        setThumbnailLoading(true);
+        
+        try {
+          const thumbnailUrl = await fetchYouTubeThumbnail(newContent.url);
+          
+          if (isMounted) {
+            setNewContent(prev => ({
+              ...prev,
+              thumbnail: thumbnailUrl
+            }));
+          }
+        } catch (error) {
+          console.error('Error processing YouTube URL:', error);
+          if (isMounted) {
+            setNewContent(prev => ({
+              ...prev,
+              thumbnail: ''
+            }));
+          }
+        } finally {
+          if (isMounted) {
+            setThumbnailLoading(false);
+          }
+        }
+      } else if (isMounted) {
         setNewContent(prev => ({
           ...prev,
           thumbnail: ''
         }));
       }
-    } else {
-      setNewContent(prev => ({
-        ...prev,
-        thumbnail: ''
-      }));
-    }
+    };
+  
+    // Debounce the thumbnail fetch to avoid rapid updates
+    const debounceTimer = setTimeout(updateThumbnail, 500);
+    
+    return () => {
+      isMounted = false;
+      clearTimeout(debounceTimer);
+    };
   }, [newContent.url, newContent.type]);
 
   const handleCreateCourse = () => {
@@ -158,7 +237,13 @@ const CourseCreator = () => {
             <div className="course-header">
               <h1>{selectedCourse.title}</h1>
               <div className="course-actions">
-                <button className="save-btn">Save Course</button>
+                <button 
+                className="save-btn" 
+                onClick={handleSaveCourse} 
+                disabled={!selectedCourse}
+                >
+                  Save Course
+                </button>
                 <button className="publish-btn">Publish</button>
               </div>
             </div>

@@ -29,54 +29,45 @@ function Login() {
     // Form submit handler
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         if (!validateEmail(formData.email)) {
             setError("Please enter a valid email address");
             return;
         }
-
+    
         if (formData.password.length < 6) {
             setError("Password must be at least 6 characters long");
             return;
         }
-
-        setIsLoading(true); // Start loading
-        setError(""); // Clear previous errors
-
+    
+        setIsLoading(true);
+        setError("");
+    
         try {
             const response = await axios.post("http://localhost:3001/login", formData, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
             });
-
-            axios.post('http://localhost:3001/login', {
-                username: userInput.username,
-                password: userInput.password,
-              })
-              .then(response => console.log(response))
-              .catch(error => console.error(error));
-
-            console.log("Response:", response.data);
-
+    
             if (response.data.token) {
-                localStorage.setItem("token", response.data.token); // Store token
-                setIsLoggedIn(true); // Update login state
-                alert("Login successful!"); // Show success message
-                navigate("/dashboard"); // Redirect to Dashboard
+                localStorage.setItem("token", response.data.token);
+                setIsLoggedIn(true);
+                alert("Login successful!");
+                navigate("/dashboard");
             } else {
                 setError("Login failed: No token received");
             }
         } catch (error) {
             console.error("Error Response:", error.response);
             setError(
-                error.response?.data?.message ||
-                "Login failed: Invalid credentials or server error"
+                error.response?.status === 401
+                    ? "Invalid email or password. Please try again."
+                    : error.response?.data?.message || "An unexpected error occurred."
             );
         } finally {
-            setIsLoading(false); // Stop loading
+            setIsLoading(false);
         }
     };
+    
 
     return (
         <div className="container mt-4 flex row justify-content-center">

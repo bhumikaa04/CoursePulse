@@ -6,21 +6,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authenticateToken = require('./authMiddleware');
 require('dotenv').config();
-<<<<<<< HEAD
 const Course = require('./model/CourseSchema'); 
 const profileModel = require('./model/ProfileSchema');
-=======
 const Router = express.Router;
-const Course = require('./model/CourseSchema'); 
-
->>>>>>> 48574c3ee459a2fcb004acb7b31d5bb4a05285bf
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/CoursePulse')
+mongoose.connect('mongodb+srv://itsbhumika04:itsbhumika04@cluster0.9iaylg7.mongodb.net/')
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Connection error:', err));
 
@@ -35,8 +30,34 @@ mongoose.connect('mongodb://localhost:27017/CoursePulse')
 const router = express.Router();
 
 // Dashboard Route (Protected)
-app.get('/dashboard', authenticateToken, (req, res) => {
-    res.json({ message: 'Welcome to the dashboard!', user: req.user });
+// Middleware: Ensure `req.user` is set correctly
+function authenticationToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user; // Attach decoded user (which includes email)
+    next();
+  });
+}
+
+// Route: Handle missing username
+app.get('/dashboard', authenticationToken, (req, res) => {
+  try {
+    res.json({
+      message: 'Welcome to the dashboard!',
+      user: {
+        email: req.user.email,
+        username: req.user.username || req.user.email.split('@')[0] // Fallback
+      }
+    });
+  } catch (err) {
+    console.error("Dashboard error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // Register Route
@@ -109,12 +130,21 @@ router.post('/register', async (req, res) => {
       }
 
       // Check for duplicate username or email
-      const user = new userModel({ email, username, password });
+      // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        const newUser = await userModel.create({
+            email,
+            username,
+            password: hashedPassword  // Store the hashed version
+        });
+        
+        res.status(201).json(newUser);
 
-      await user.save(); // Save the user to the database
+      await newuser.save(); // Save the user to the database
 
       res.status(201).json({ message: "Registration successful" });
-      console.log("User registered successfully:", user);
+      console.log("User registered successfully:", newUser);
   } catch (err) {
       console.error("Error in register route:", err);
 
@@ -130,7 +160,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-
 // Login Route
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -138,6 +167,7 @@ router.post('/login', async (req, res) => {
     try {
         const user = await userModel.findOne({ email });
         if (!user) {
+            console.log('User not found');
             return res.status(401).json({ message: "Invalid email entered" });
         }
 
@@ -158,7 +188,27 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+// router.post('/login', async (req, res) => {
+//   console.log('Login attempt for:', req.body.email);
+//   const { email, password } = req.body;
 
+//   try {
+//       const user = await userModel.findOne({ email });
+//       if (!user) {
+//           console.log('User not found');
+//           return res.status(401).json({ message: "Invalid email entered" });
+//       }
+
+//       console.log('Stored hash:', user.password);
+//       console.log('Provided password:', password);
+      
+//       const isPasswordValid = await bcrypt.compare(password, user.password);
+//       console.log('Password valid:', isPasswordValid);
+      
+//       if (!isPasswordValid) {
+//           return res.status(401).json({ message: "Invalid password" });
+//       }
+//       // ... rest of your code
 
 // Autocomplete suggestions
 router.get('/suggestions', async (req, res) => {
@@ -247,6 +297,64 @@ router.get('/profile/:username', async (req, res) => {
   } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Example route
+app.post('/create-course', async (req, res) => {
+  try {
+    const course = new Course(req.body);
+    await course.save();
+    res.status(201).send(course);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// Save/Update course
+router.post('/create-course/save', async (req, res) => {
+  try {
+    const { course, userEmail } = req.body;
+    console.log('Request received:', req.body);
+  try {
+    // Your save logic
+    res.json(savedCourse);
+  } catch (err) {
+    console.error('Save error:', err);
+    res.status(500).json({ error: err.message });
+    // Check if user is authenticated
+    if (req.body.userEmail !== req.user.email) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    const { courseName, description } = req.body; // Validate and save course data
+    // If course has _id, it's an update
+    if (course._id) {
+      const updatedCourse = await Course.findByIdAndUpdate(
+        course._id,
+        {
+          $set: {
+            title: course.title,
+            contents: course.contents,
+            updatedAt: new Date()
+          }
+        },
+        { new: true }
+      );
+      return res.json(updatedCourse);
+    }
+    
+    // Otherwise create new course
+    const newCourse = new Course({
+      title: course.title,
+      ownerEmail: userEmail,
+      contents: course.contents,
+      published: false
+    });
+    
+    await newCourse.save();
+    res.status(201).json(newCourse);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

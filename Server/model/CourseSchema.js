@@ -1,57 +1,60 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const courseSchema = new mongoose.Schema(
-  {
-    title: {
-      type: String,
-      required: true,
-      text: true, // Enables text search
-    },
-    description: {
-      type: String,
-      text: true, // Enables text search
-    },
-    instructor: {
-      type: String,
-      required: true,
-    },
-    category: {
-      type: String,
-      required: true,
-      enum: ['web', 'design', 'business', 'data'], // Matches categories in the React component
-    },
-    difficulty: {
-      type: String,
-      required: true,
-      enum: ['beginner', 'intermediate', 'advanced'],
-    },
-    rating: {
-      type: Number,
-      required: true,
-      min: 0,
-      max: 5,
-    },
-    reviews: {
-      type: Number,
-      default: 0,
-    },
-    imageUrl: {
-      type: String,
-      default: '/default-course.jpg', // Default image URL
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
+const contentSchema = new Schema({
+  title: { 
+    type: String, 
+    required: true 
   },
-  {
-    timestamps: true, // Automatically manage createdAt and updatedAt fields
+  type: { 
+    type: String, 
+    enum: ['video', 'article', 'podcast'], 
+    required: true 
+  },
+  url: { 
+    type: String, 
+    required: true 
+  },
+  description: { 
+    type: String 
+  },
+  thumbnail: { 
+    type: String 
+  },
+  createdAt: { 
+    type: Date, 
+    default: Date.now 
   }
-);
+});
 
-// Indexes for search optimization
-courseSchema.index({ title: 'text', description: 'text' }); // Full-text search for title and description
+const courseSchema = new Schema({
+  title: { 
+    type: String, 
+    required: true 
+  },
+  ownerEmail: { 
+    type: String, 
+    required: true 
+  },  // Links to user's email
+  contents: [contentSchema],  // Array of content subdocuments
+  published: { 
+    type: Boolean, 
+    default: false 
+  },
+  createdAt: { 
+    type: Date, 
+    default: Date.now 
+  },
+  updatedAt: { 
+    type: Date, 
+    default: Date.now
+  }
+});
 
-const Course = mongoose.model('Course', courseSchema);
+// Update the updatedAt field before saving
+courseSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
 
-module.exports = Course;
+module.exports = mongoose.model('Course', courseSchema);

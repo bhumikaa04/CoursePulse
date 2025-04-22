@@ -360,7 +360,8 @@
 }
 
 .video-thumbnail-preview {
-  width: 100%;
+  width: 150px; /* Adjust as needed */
+  height: 100px; /* Maintain aspect ratio */
   border-radius: 4px;
   border: 1px solid #BDC3C7;
 }
