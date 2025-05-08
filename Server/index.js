@@ -19,24 +19,17 @@ mongoose.connect('mongodb+srv://itsbhumika04:itsbhumika04@cluster0.9iaylg7.mongo
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Connection error:', err));
 
-// const mongoURI = process.env.MONGO_URI || 'your-atlas-connection-string-here';
-
-// mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-//   .then(() => console.log('Connected to MongoDB Atlas'))
-//   .catch(err => console.error('Connection error:', err));
-
-
 // Define Express Router
 const router = express.Router();
 
 // Dashboard Route (Protected)
+
 // Middleware: Ensure `req.user` is set correctly
 function authenticationToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   
   if (!token) return res.sendStatus(401);
-
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);
     req.user = user; // Attach decoded user (which includes email)
@@ -59,55 +52,6 @@ app.get('/dashboard', authenticationToken, (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
-// Register Route
-// router.post('/register', async (req, res) => {
-//     const { email, password , username } = req.body;
-
-//     if (!email || !password || !username) {
-//         return res.status(400).json({ message: "All fields are required" });
-//     }
-//     if (password.length < 6) {
-//         return res.status(400).json({ message: "Password must be at least 6 characters long" });
-//     }
-//     if (!email.includes('@')) {
-//         return res.status(400).json({ message: "Invalid email format" });
-//     }
-//     if (!username) {
-//         return res.status(400).json({ message: "Username is required" });
-//     }
-//     if (username.length < 3) {
-//         return res.status(400).json({ message: "Username must be at least 3 characters long" });
-//     }
-
-//     try {
-//         // Check if the user already exists
-//         const existingUser = await userModel.findOne({ email });
-//         if (existingUser) {
-//             return res.status(400).json({ message: "User already exists" });
-//         }
-
-//         // Hash the password before saving
-//         const salt = await bcrypt.genSalt(10);
-//         const hashedPassword = await bcrypt.hash(password, salt);
-
-//         // Create a new user
-//         const user = new userModel({ email, username, password: hashedPassword });
-//         await user.save();
-
-//         // Generate JWT token
-//         const token = jwt.sign(
-//             { userId: user._id, email: user.email, username: user.username },
-//             process.env.JWT_SECRET,
-//             { expiresIn: process.env.JWT_EXPIRES_IN }
-//         );
-
-//         res.status(201).json({ token });
-//     } catch (err) {
-//         console.error("error in register route : " + err);
-//         res.status(500).json({ message: "Server error" });
-//     }
-// });
 
 router.post('/register', async (req, res) => {
   try {
@@ -188,27 +132,6 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
-// router.post('/login', async (req, res) => {
-//   console.log('Login attempt for:', req.body.email);
-//   const { email, password } = req.body;
-
-//   try {
-//       const user = await userModel.findOne({ email });
-//       if (!user) {
-//           console.log('User not found');
-//           return res.status(401).json({ message: "Invalid email entered" });
-//       }
-
-//       console.log('Stored hash:', user.password);
-//       console.log('Provided password:', password);
-      
-//       const isPasswordValid = await bcrypt.compare(password, user.password);
-//       console.log('Password valid:', isPasswordValid);
-      
-//       if (!isPasswordValid) {
-//           return res.status(401).json({ message: "Invalid password" });
-//       }
-//       // ... rest of your code
 
 // Autocomplete suggestions
 router.get('/suggestions', async (req, res) => {
@@ -300,7 +223,6 @@ router.get('/profile/:username', async (req, res) => {
   }
 });
 
-// Example route
 app.post('/create-course', async (req, res) => {
   try {
     const course = new Course(req.body);
@@ -311,55 +233,78 @@ app.post('/create-course', async (req, res) => {
   }
 });
 
-// Save/Update course
-router.post('/create-course/save', async (req, res) => {
+app.post('/create-course/save', authenticationToken, async (req, res) => {
   try {
-    const { course, userEmail } = req.body;
-    console.log('Request received:', req.body);
-  try {
-    // Your save logic
-    res.json(savedCourse);
-  } catch (err) {
-    console.error('Save error:', err);
-    res.status(500).json({ error: err.message });
-    // Check if user is authenticated
-    if (req.body.userEmail !== req.user.email) {
-      return res.status(403).json({ error: 'Unauthorized' });
+    const { course } = req.body;
+
+    // Validate course data
+    if (!course || !course.title) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
-    const { courseName, description } = req.body; // Validate and save course data
-    // If course has _id, it's an update
+
+    let savedCourse;
     if (course._id) {
-      const updatedCourse = await Course.findByIdAndUpdate(
-        course._id,
+      // Check if the course exists and belongs to the user
+      const existingCourse = await Course.findOne({ _id: course._id, ownerEmail: req.user.email });
+      if (!existingCourse) {
+        return res.status(404).json({ error: 'Course not found or unauthorized' });
+      }
+
+      // Update existing course
+      savedCourse = await Course.findOneAndUpdate(
+        { _id: course._id, ownerEmail: req.user.email },
         {
           $set: {
             title: course.title,
-            contents: course.contents,
-            updatedAt: new Date()
-          }
+            contents: course.contents || [],
+            updatedAt: new Date(),
+          },
         },
         { new: true }
       );
-      return res.json(updatedCourse);
+    } else {
+      // Create a new course
+      const newCourse = new Course({
+        title: course.title,
+        ownerEmail: req.user.email,
+        contents: course.contents || [],
+        published: false,
+      });
+      savedCourse = await newCourse.save();
     }
-    
-    // Otherwise create new course
-    const newCourse = new Course({
-      title: course.title,
-      ownerEmail: userEmail,
-      contents: course.contents,
-      published: false
-    });
-    
-    await newCourse.save();
-    res.status(201).json(newCourse);
+
+    res.status(201).json(savedCourse);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Save error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// router.get('/courses', authenticateToken, async (req, res) => {
+//   try {
+//     const courses = await Course.find({ ownerEmail: req.user.email });
+//     res.json(courses);
+//   } catch (err) {
+//     console.error('Error fetching courses:', err);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+// Get user courses
+app.get('/courses', authenticateToken, async (req, res) => {
+  try {
+    const courses = await Course.find({ ownerEmail: req.user.email });
+    res.json(courses);
+  } catch (err) {
+    console.error('Error fetching courses:', err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
 // Use the router in the Express app
 app.use('/', router);
+app.use('/create-course', router); 
 
 // Start the server
 app.listen(3001, () => {

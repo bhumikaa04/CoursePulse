@@ -12,6 +12,7 @@ import {BrowserRouter , Routes , Route} from 'react-router-dom'
 import SearchComponent from './components/SearchComponent.jsx'
 import CourseCreator from './components/CourseCreator.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
+import VideoPlayer from './components/VideoPlayer.jsx'
 
 function App() {
   return (
@@ -31,6 +32,9 @@ function App() {
           <Route path="/search" element={<SearchComponent />} />
           <Route path="/create-course" element={<CourseCreator />} />
           <Route path="/profile/:username" element={<ProfilePage />} />
+          <Route path="/video-player" element={<VideoPlayer />} />
+          <Route path="/video-player/:contentId" element={<VideoPlayer />} />
+          <Route path="/video-player/:contentId/:type" element={<VideoPlayer />} />
         </Routes>
       </BrowserRouter>
     </>
