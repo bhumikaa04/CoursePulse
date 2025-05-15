@@ -4,11 +4,12 @@ import { FaUserCircle } from "react-icons/fa"; // Profile Icon
 import "../styles/style.css";
 import LogoutButton from "./Logout"; // Import the LogoutButton component
 import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext"; // Import the useAuth hook
 
 const Navbar = () => {
     const { isLoggedIn , setIsLoggedIn } = useContext(AuthContext);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const { username } = useParams(); // Get username from the route params
+    const { username } = useAuth(); // Get username from the route params
 
     return (
         <nav className="navbar">

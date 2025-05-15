@@ -16,40 +16,6 @@ function Signup() {
         });
     };
 
-// Handling form submit
-// const handleSubmit = async (e) => {
-//     e.preventDefault(); // Prevent page reload
-//     console.log("Form Data:", formData); // Debugging what is being sent
-
-//     try {
-//         // Axios request to the backend API
-//         const response = await axios.post("http://localhost:3001/register", formData, {
-//             headers: {
-//                 "Content-Type": "application/json", // Tells the server it's JSON data
-//             },
-//         });
-
-//         console.log("Response:", response.data);
-
-//         if (response.data.token) {
-//             // Store the JWT token in localStorage
-//             localStorage.setItem("token", response.data.token);
-//             alert("Registration successful!");
-//             navigate("/login"); // Redirect to the login page
-//         }
-//     } catch (error) {
-//         console.error("Error Response:", error.response);
-
-//         // Handle backend error messages dynamically
-//         if (error.response && error.response.data && error.response.data.message) {
-//             alert(`Registration failed: ${error.response.data.message}`);
-//         } else {
-//             alert("Registration failed: Unexpected error occurred");
-//         }
-//     }
-// };
-
-
 const handleSubmit = async (e) => {
     e.preventDefault();
 

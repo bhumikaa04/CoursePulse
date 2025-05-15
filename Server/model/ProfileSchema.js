@@ -7,8 +7,7 @@ const profileSchema = new mongoose.Schema({
         required: true
     },
     firstName: {
-        type: String,
-        required: true
+        type: String
     },
     middleName: {
         type: String,
@@ -18,15 +17,15 @@ const profileSchema = new mongoose.Schema({
     },
     age: {
         type: Number,
-        required: true
+        min: 0,
     },
     bio: {
         type: String,
-        required: true
+        default: 'No bio available'
     },
     profilePhoto: {
         type: String,
-        default: 'https://example.com/default-profile-photo.jpg'
+        default: '../authentication/public/profile_image.jpg'
     }, 
     followers: {
         type: Number,

@@ -35,8 +35,6 @@ const VideoPlayer = ({ content, onClose }) => {
           ×
         </button>
         
-        <h3 id="video-player-title">{content.title}</h3>
-        
         {content.type === 'video' ? (
           <div className="video-embed-container">
             <iframe
@@ -62,12 +60,6 @@ const VideoPlayer = ({ content, onClose }) => {
             >
               Open {content.type}
             </a>
-          </div>
-        )}
-        
-        {content.description && (
-          <div className="content-description">
-            <p>{content.description}</p>
           </div>
         )}
       </div>

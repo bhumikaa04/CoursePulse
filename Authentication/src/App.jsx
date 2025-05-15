@@ -13,11 +13,13 @@ import SearchComponent from './components/SearchComponent.jsx'
 import CourseCreator from './components/CourseCreator.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import VideoPlayer from './components/VideoPlayer.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'
 
 function App() {
   return (
     
     <>
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -28,7 +30,6 @@ function App() {
           <Route path="/about" element={<OuterAbout />} />
           <Route path="/OuterHome" element={<OuterHome />} />
           <Route path="/explore" element={<Explore />} />
-          <Route path="/profileForm" element={<ProfileForm />} />
           <Route path="/search" element={<SearchComponent />} />
           <Route path="/create-course" element={<CourseCreator />} />
           <Route path="/profile/:username" element={<ProfilePage />} />
@@ -36,7 +37,8 @@ function App() {
           <Route path="/video-player/:contentId" element={<VideoPlayer />} />
           <Route path="/video-player/:contentId/:type" element={<VideoPlayer />} />
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter>  
+    </AuthProvider>
     </>
   )
 }
