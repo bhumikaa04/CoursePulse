@@ -47,9 +47,14 @@ function Login() {
             const response = await axios.post("http://localhost:3001/login", formData, {
                 headers: { "Content-Type": "application/json" },
             });
+
+            console.log("Response Data:", response.data); // Log the response data
+            const data = response.data;
     
             if (response.data.token) {
-                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("user", JSON.stringify(data.user));
+                localStorage.setItem("profile", JSON.stringify(response.data.profile));
                 setIsLoggedIn(true);
                 alert("Login successful!");
                 navigate("/dashboard");
@@ -58,11 +63,11 @@ function Login() {
             }
         } catch (error) {
             console.error("Error Response:", error.response);
-            setError(
-                error.response?.status === 401
-                    ? "Invalid email or password. Please try again."
-                    : error.response?.data?.message || "An unexpected error occurred."
-            );
+            // setError(
+            //     error.response?.status === 401
+            //         ? "Invalid email or password. Please try again."
+            //         : error.response?.data?.message || "An unexpected error occurred."
+            // );
         } finally {
             setIsLoading(false);
         }

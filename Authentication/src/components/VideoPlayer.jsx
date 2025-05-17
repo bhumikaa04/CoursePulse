@@ -16,10 +16,12 @@ const VideoPlayer = ({ content, onClose }) => {
   const getEmbedUrl = (url) => {
     if (content.type !== 'video') return url;
 
-    const videoId = getYouTubeId(url);
-    if (videoId) {
-      return `https://www.youtube.com/embed/${videoId}?rel=0`; // Prevent related videos
-    }
+    // const videoId = getYouTubeId(url);
+    // if (videoId) {
+    //   console.log('YouTube Video ID:', videoId); // Log the video ID
+    //   return `https://www.youtube.com/embed/${videoId}?rel=0`; // Prevent related videos
+    // }
+    console.error('URL:', url); // Log invalid URL
     return url;
   };
 

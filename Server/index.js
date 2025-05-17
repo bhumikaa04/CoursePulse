@@ -9,10 +9,21 @@ require('dotenv').config();
 const Course = require('./model/CourseSchema'); 
 const profileModel = require('./model/ProfileSchema');
 const Router = express.Router;
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const bodyParser = require("body-parser");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use(bodyParser.json({ limit: "100mb" }));
+app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
+
+app.use('/uploads/images', express.static(path.join(__dirname, 'uploads/images')));
 
 // Connect to MongoDB
 mongoose.connect('mongodb+srv://itsbhumika04:itsbhumika04@cluster0.9iaylg7.mongodb.net/')
@@ -36,36 +47,6 @@ function authenticationToken(req, res, next) {
     next();
   });
 }
-
-// Route: Handle missing username
-// app.get('/dashboard', authenticationToken, (req, res) => {
-
-//   try {
-//     // Fetch the user data from database
-//     const user = await userModel.findOne({ email: req.user.email });
-    
-//     if (!user) {
-//       console.log('User not found in database');
-//       return res.status(404).json({ error: "User not found" });
-//     }
-    
-//     // Log the user data
-//     console.log('User data from database:', user);
-//   try {
-//     res.json({
-//       message: 'Welcome to the dashboard!',
-//       user: {
-//         email: req.user.email,
-//         username: req.user.username || req.user.email.split('@')[0] // Fallback
-//       }
-//     });
-
-//   } catch (err) {
-//     console.error("Dashboard error:", err);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// });
-
 
 app.get('/dashboard', authenticationToken, async (req, res) => {
   try {
@@ -144,7 +125,7 @@ router.post('/register', async (req, res) => {
             lastName: lastName || "",
             age: age || 0,
             bio: bio || "",
-            profilePhoto: "https://i.imgur.com/default-profile.jpg",
+            profilePhoto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkBgwHNkzJDKiKXU6EiDIHIIvUR7YnO0SqGw&s",
             followers: 0,
             following: 0,
             courseCreated: 0,
@@ -193,14 +174,19 @@ router.post('/login', async (req, res) => {
 
 
         const profile = await profileModel.findOne({ username: user.username });
-        console.log('Profile found:', profile);
+        // console.log('Profile found:', profile);
+
         if (!profile) {
           console.log("Profile not found for user:", user._id);
           return res.status(404).json({ message: "User profile not found" });
         }
 
         const token = jwt.sign(
-            { userId: user._id, email: user.email },
+            { 
+              userId: user._id, 
+              email: user.email, 
+              username: user.username
+            },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }, 
         );
@@ -210,13 +196,8 @@ router.post('/login', async (req, res) => {
             token,
             isLoggedIn: true,
             message: "Login successful" , 
-            username: user.username,
-            email: user.email,
-            user: {
-                username: user.username,
-                email: user.email,
-                //...profile._doc // Spread operator to include profile fields
-            }
+            user, 
+            profile
         });
 
     } catch (err) {
@@ -322,6 +303,187 @@ router.get('/profile/:username', async (req, res) => {
     }
 });
 
+// router.put("/profile/:username", async (req, res) => {
+//   const { username } = req.params;
+//   const { firstName, lastName, bio, profilePhoto } = req.body;
+
+//   try {
+//     const updatedProfile = await Profile.findOneAndUpdate(
+//       { username },
+//       { firstName, lastName, bio, profilePhoto },
+//       { new: true, runValidators: true } // Return updated doc
+//     );
+
+//     if (!updatedProfile) {
+//       return res.status(404).json({ error: "Profile not found" });
+//     }
+
+//     res.status(200).json(updatedProfile);
+//   } catch (err) {
+//     console.error("Error updating profile:", err);
+//     res.status(500).json({ error: "Failed to update profile" });
+//   }
+// });
+
+// Route to update the profile
+// app.get("/edit-profile/:username", async (req, res) => {
+//   const { username } = req.params;
+
+//   try {
+//     const profile = await Profile.findOne({ username });
+//     if (!profile) return res.status(404).send("Profile not found");
+//     res.status(200).json(profile);
+//   } catch (error) {
+//     console.error("Error fetching profile:", error);
+//     res.status(500).send("Internal server error");
+//   }
+// });
+
+// app.put("/edit-profile/:username", async (req, res) => {
+//   const { username } = req.params;
+//   const updatedData = req.body;
+
+//       // If profilePhoto is base64, process it
+//     if (updateData.profilePhoto && updateData.profilePhoto.startsWith('data:image')) {
+//       // Extract the base64 string and the image type
+//       const base64Data = updatedData.profilePhoto.split(',')[1];
+//       const imageType = updatedData.profilePhoto.split(';')[0].split(':')[1].split('/')[1]; // e.g., 'jpeg', 'png'
+//       // Generate a unique filename
+//       const filename = `${username}-profile.${imageType}`;
+//       const filePath = path.join(__dirname, 'uploads', filename); // Ensure 'uploads' directory exists
+//       // Write the base64 image to a file
+//       fs.writeFileSync(filePath, base64Data, { encoding: 'base64' });
+//       // Update the profile photo URL in the updateData
+//       updateData.profilePhoto = `/uploads/images/${filename}`; // Adjust the path as necessary for serving static files
+//     }
+
+//   try {
+//     const profile = await profileModel.findOneAndUpdate(
+//       { username },
+//       updatedData,
+//       { new: true }
+//     );
+
+//     if (!profile) return res.status(404).send("Profile not found");
+//     res.status(200).json(profile);
+//   } catch (error) {
+//     console.error("Error updating profile:", error);
+//     res.status(500).send("Internal server error");
+//   }
+// });
+
+
+// Configure storage for profile photos
+
+const profilePhotoStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../uploads/images');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const uploadProfilePhoto = multer({ 
+  storage: profilePhotoStorage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: {
+    fileSize: 100 * 1024 * 1024 // 100MB limit
+  }
+});
+
+app.post('/upload-profile-photo/:username', uploadProfilePhoto.single('profilePhoto'), async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    if (req.file) {
+      const imagePath = `/uploads/images/${req.file.filename}`;
+      const profile = await profileModel.findOneAndUpdate(
+        { username },
+        { profilePhoto: imagePath },
+        { new: true }
+      );
+
+      if (!profile) {
+        return res.status(404).json({ error: "Profile not found" });
+      }
+
+      res.status(200).json({ message: "Profile photo updated", profile });
+    } else {
+      res.status(400).json({ error: "No file uploaded" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Internal server error" });
+  }
+});
+
+app.patch('/edit-profile/:username', async (req, res) => {
+  const { username } = req.params;
+  const updatedData = req.body;
+
+  try {
+    const profile = await profileModel.findOneAndUpdate(
+      { username },
+      updatedData,
+      { new: true, runValidators: true }
+    );
+
+    if (!profile) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+
+    res.status(200).json(profile);
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Internal server error" });
+  }
+});
+
+app.put("/edit-profile/:username", uploadProfilePhoto.single('profilePhoto'), async (req, res) => {
+  const { username } = req.params;
+  const updatedData = req.body;
+
+  try {
+    if (req.file) {
+      updatedData.profilePhoto = `/uploads/images/${req.file.filename}`;
+
+      const oldProfile = await profileModel.findOne({ username });
+      if (oldProfile && oldProfile.profilePhoto &&
+          !oldProfile.profilePhoto.includes('default-profile-image.jpg')) {
+        const oldPhotoPath = path.join(__dirname, '..', oldProfile.profilePhoto);
+        if (fs.existsSync(oldPhotoPath)) {
+          fs.unlinkSync(oldPhotoPath);
+        }
+      }
+    }
+
+    const profile = await profileModel.findOneAndUpdate(
+      { username },
+      updatedData,
+      { new: true, runValidators: true }
+    );
+
+    if (!profile) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+
+    res.status(200).json(profile);
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Internal server error" });
+  }
+});
+
+
 
 app.post('/create-course', async (req, res) => {
   try {
@@ -337,7 +499,6 @@ app.post('/create-course/save', authenticationToken, async (req, res) => {
   try {
     // Log the entire request body first
     console.log('Full request body:', req.body);
-    
     const { course } = req.body;
 
     // Detailed logging of the course data
@@ -378,6 +539,8 @@ app.post('/create-course/save', authenticationToken, async (req, res) => {
     }
 
     let savedCourse;
+    let isNewCourse = false;
+
     if (course._id) {
       console.log('Processing course update for ID:', course._id);
       
@@ -411,7 +574,15 @@ app.post('/create-course/save', authenticationToken, async (req, res) => {
         published: false,
       });
       savedCourse = await newCourse.save();
+      isNewCourse = true;
       console.log('New course created:', savedCourse);
+
+      // Increment courseCreated count for the user
+      await User.updateOne(
+        { email: req.user.email },
+        { $inc: { courseCreated: 1 } }
+      );
+      console.log('User course count incremented');
     }
 
     res.status(201).json(savedCourse);
@@ -426,6 +597,112 @@ app.post('/create-course/save', authenticationToken, async (req, res) => {
 });
 
 // Get user courses
+
+
+// app.post('/create-course/save', authenticationToken, async (req, res) => {
+//   try {
+//     // Log the entire request body first
+//     console.log('Full request body:', req.body);
+//     const { course } = req.body;
+
+//     // Detailed logging of the course data
+//     console.log('Received course data:', {
+//       title: course?.title,
+//       hasContents: !!course?.contents,
+//       contentsLength: course?.contents?.length || 0,
+//       isUpdate: !!course?._id,
+//       ownerEmail: req.user.email // From auth token
+//     });
+
+//     // Validate course data exists
+//     if (!course) {
+//       console.error('No course data received');
+//       return res.status(400).json({ error: 'Missing course data' });
+//     }
+
+//     // Validate required fields
+//     if (!course.title) {
+//       console.error('Missing title in course data:', course);
+//       return res.status(400).json({ error: 'Missing required title field' });
+//     }
+
+//     // Log contents if they exist
+//     if (course.contents && course.contents.length > 0) {
+//       console.log('Contents received:');
+//       course.contents.forEach((content, index) => {
+//         console.log(`Content ${index + 1}:`, {
+//           title: content.title,
+//           type: content.type,
+//           url: content.url,
+//           description: content.description?.length || 'No description',
+//           thumbnail: content.thumbnail ? 'Has thumbnail' : 'No thumbnail'
+//         });
+//       });
+//     } else {
+//       console.log('No contents received or empty contents array');
+//     }
+
+//     let savedCourse;
+//     if (course._id) {
+//       console.log('Processing course update for ID:', course._id);
+      
+//       const existingCourse = await Course.findOne({ _id: course._id, ownerEmail: req.user.email });
+//       if (!existingCourse) {
+//         console.error('Course not found or unauthorized:', {
+//           requestedId: course._id,
+//           ownerEmail: req.user.email
+//         });
+//         return res.status(404).json({ error: 'Course not found or unauthorized' });
+//       }
+
+//       savedCourse = await Course.findOneAndUpdate(
+//         { _id: course._id, ownerEmail: req.user.email },
+//         {
+//           $set: {
+//             title: course.title,
+//             contents: course.contents || [],
+//             updatedAt: new Date(),
+//           },
+//         },
+//         { new: true }
+//       );
+//       console.log('Course updated:', savedCourse);
+//     } else {
+//       console.log('Creating new course');
+//       const newCourse = new Course({
+//         title: course.title,
+//         ownerEmail: req.user.email,
+//         contents: course.contents || [],
+//         published: false,
+//       });
+//       savedCourse = await newCourse.save();
+//       console.log('New course created:', savedCourse);
+
+//       // Increment courseCreated count in user's profile
+//       try {
+//         const updatedProfile = await profileModel.findOneAndUpdate(
+//           { email: req.user.email },
+//           { $inc: { courseCreated: 1 } },
+//           { new: true }
+//         );
+//         console.log('Profile course count updated:', updatedProfile.courseCreated);
+//       } catch (profileErr) {
+//         console.error('Failed to update profile course count:', profileErr);
+//         // Continue even if profile update fails
+//       }
+//     }
+
+//     res.status(201).json(savedCourse);
+//   } catch (err) {
+//     console.error('Save error:', {
+//       error: err.message,
+//       stack: err.stack,
+//       requestBody: req.body
+//     });
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
 app.get('/courses', authenticateToken, async (req, res) => {
   try {
     console.log('Fetching courses for user:', req.user.email);
@@ -437,12 +714,6 @@ app.get('/courses', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
-//document upload
-// In your backend (e.g., Express.js)
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 
 // Configure storage
 const storage = multer.diskStorage({
@@ -485,6 +756,45 @@ router.post('/upload-document', authenticateToken, upload.single('document'), as
     res.status(500).json({ error: 'Failed to upload document' });
   }
 });
+
+// Dummy data for progress
+const progressData = {
+  7: { completedTasks: 5, totalTasks: 10, progressPercent: 50 },
+  30: { completedTasks: 20, totalTasks: 40, progressPercent: 50 },
+};
+
+// Endpoint: /progress?days=7
+app.get("/progress", (req, res) => {
+  const days = req.query.days || "7"; // default to 7 days if not provided
+  const data = progressData[days] || progressData["7"];
+  res.json({
+    days,
+    data,
+  });
+});
+
+// Endpoint: /recent-activities
+app.get("/recent-activities", (req, res) => {
+  // Example list of recent activities
+  const activities = [
+    { id: 1, activity: "Completed chapter 3 of Data Structures", date: "2025-05-15" },
+    { id: 2, activity: "Solved 5 coding problems", date: "2025-05-14" },
+    { id: 3, activity: "Watched React tutorial video", date: "2025-05-13" },
+  ];
+  res.json({ activities });
+});
+
+// Endpoint: /recommended-courses
+app.get("/recommended-courses", (req, res) => {
+  // Example recommended courses
+  const courses = [
+    { id: 101, title: "Introduction to Data Science", provider: "Coursera" },
+    { id: 102, title: "React for Beginners", provider: "Udemy" },
+    { id: 103, title: "Advanced Algorithms", provider: "edX" },
+  ];
+  res.json({ courses });
+});
+
 
 // Use the router in the Express app
 app.use('/', router);

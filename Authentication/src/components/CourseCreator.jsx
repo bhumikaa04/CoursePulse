@@ -3,9 +3,13 @@ import '../styles/CourseCreator.css';
 import { AuthContext } from '../context/AuthContext'; 
 import { FiMoreVertical, FiEdit2, FiTrash2, FiExternalLink, FiPlus } from 'react-icons/fi';
 import VideoPlayer from './VideoPlayer';
+import { useAuth } from '../context/AuthContext'; // Assuming you have an AuthContext for user authentication
 
 const CourseCreator = () => {
-  const { user } = useContext(AuthContext);
+  // const { userDetails } = useContext(AuthContext);
+  const { storedUser, profile , username } = useAuth();
+  const {profile: storedProfile } = useContext(AuthContext);
+  const [profileData, setProfileData] = useState(storedProfile || {});
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [editingContent, setEditingContent] = useState(null);
@@ -24,6 +28,7 @@ const CourseCreator = () => {
   const [isAddingContent, setIsAddingContent] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
 
+
   const getYouTubeId = (url) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url?.match(regExp);
@@ -31,11 +36,14 @@ const CourseCreator = () => {
   };
 
   useEffect(() => {
+
+    console.log(profileData); 
+
     const fetchUserCourses = async () => {
-      if (!user?.email) return;
+      if (!storedUser?.email) return;
 
       try {
-        const response = await fetch('/courses', {
+        const response = await fetch('http://localhost:3001/courses', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -62,7 +70,7 @@ const CourseCreator = () => {
     };
 
     fetchUserCourses();
-  }, [user?.email]);
+  }, [storedUser.email]);
 
   const handleCreateCourse = () => {
     if (newCourseTitle.trim() === '') {
@@ -82,7 +90,9 @@ const CourseCreator = () => {
   };
 
   const handleSaveCourse = async () => {
-    if (!user?.email) {
+    console.log('Saving course:', selectedCourse);
+    console.log('User:', storedUser);
+    if (!storedUser.email) {
       alert('Please log in first');
       return;
     }
@@ -93,7 +103,7 @@ const CourseCreator = () => {
     }
   
     try {
-      const response = await fetch('/create-course/save', {
+      const response = await fetch('http://localhost:3001/create-course/save', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,21 +114,43 @@ const CourseCreator = () => {
             ...selectedCourse,
             contents: selectedCourse.contents || []
           },
-          userEmail: user.email
+          userEmail: storedUser.email
         })
       });
+      console.log('Response:', response);
+      if (response.status === 401) {  
+        alert('Session expired. Please log in again.');
+        localStorage.removeItem('token');
+        window.location.reload();
+        return;
+      }
+      if (response.status === 403) {
+        alert('You do not have permission to save this course.');
+        return;
+      }
+      if (response.status === 500) {
+        alert('Server error. Please try again later.');
+        return;
+      }
   
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to save course');
       }
   
+      console.log('Course saved successfully');
       const savedCourse = await response.json();
       setCourses(prevCourses =>
         prevCourses.map(c =>
           c.id === selectedCourse.id ? savedCourse : c
         )
       );
+
+      setProfileData((prevProfile) => ({
+      ...prevProfile,
+      courseCreated: (prevProfile.courseCreated || 0) + 1,
+      }));
+
       setSelectedCourse(savedCourse);
       alert('Course saved successfully!');
     } catch (err) {
@@ -146,7 +178,7 @@ const CourseCreator = () => {
     try {
       setIsPublishing(true);
       
-      const response = await fetch('/api/courses/publish', {
+      const response = await fetch('/courses/publish', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +218,6 @@ const CourseCreator = () => {
   };
 
   const updateThumbnail = async () => {
-    if (newContent.type !== 'video' || !newContent.url) return;
     
     try {
       setThumbnailLoading(true);
@@ -247,7 +278,7 @@ const CourseCreator = () => {
       return;
     }
     
-    if (!['video', 'article', 'audio'].includes(newContent.type)) {
+    if (!['video', 'article', 'audio', 'document'].includes(newContent.type)) {
       alert('Please select a valid content type');
       return;
     }
@@ -297,6 +328,103 @@ const CourseCreator = () => {
       resetContentForm();
     }
   };
+
+  const handleDocumentUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Validate file type
+  const validTypes = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'text/plain',
+    'application/rtf'
+  ];
+
+  if (!validTypes.includes(file.type)) {
+    alert('Please upload a valid document file (PDF, DOC, DOCX, PPT, PPTX, TXT, RTF)');
+    return;
+  }
+
+  // Validate file size (10MB max)
+  if (file.size > 10 * 1024 * 1024) {
+    alert('File size must be less than 10MB');
+    return;
+  }
+
+  setThumbnailLoading(true);
+
+  try {
+    // Create a preview for the document
+    let thumbnail = '';
+    if (file.type === 'application/pdf') {
+      // For PDFs, we can generate a thumbnail from the first page
+      thumbnail = await generatePdfThumbnail(file);
+    } else {
+      // For other documents, use a generic icon
+      thumbnail = getDocumentIcon(file.type);
+    }
+
+    // Upload the file to the server
+    const formData = new FormData();
+    formData.append('document', file);
+    formData.append('courseId', selectedCourse?.id || '');
+    
+    const response = await fetch('http://localhost:3001/upload-document', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload document');
+    }
+
+    const { fileUrl } = await response.json();
+
+    setNewContent(prev => ({
+      ...prev,
+      url: fileUrl,
+      thumbnail: thumbnail,
+      fileName: file.name,
+      fileType: file.type,
+      fileSize: file.size
+    }));
+  } catch (error) {
+    console.error('Document upload error:', error);
+    alert('Failed to upload document: ' + error.message);
+  } finally {
+    setThumbnailLoading(false);
+  }
+};
+
+// Helper function to generate PDF thumbnail
+const generatePdfThumbnail = async (file) => {
+  return new Promise((resolve) => {
+    // In a real app, you might use pdf.js to generate a thumbnail
+    // For simplicity, we'll return a generic PDF icon
+    resolve('https://cdn-icons-png.flaticon.com/512/337/337946.png');
+  });
+};
+
+// Helper function to get document icon
+const getDocumentIcon = (fileType) => {
+  const icons = {
+    'application/pdf': 'https://cdn-icons-png.flaticon.com/512/337/337946.png',
+    'application/msword': 'https://cdn-icons-png.flaticon.com/512/888/888882.png',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'https://cdn-icons-png.flaticon.com/512/888/888882.png',
+    'application/vnd.ms-powerpoint': 'https://cdn-icons-png.flaticon.com/512/888/888883.png',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'https://cdn-icons-png.flaticon.com/512/888/888883.png',
+    'text/plain': 'https://cdn-icons-png.flaticon.com/512/824/824718.png',
+    'application/rtf': 'https://cdn-icons-png.flaticon.com/512/824/824718.png'
+  };
+  return icons[fileType] || 'https://cdn-icons-png.flaticon.com/512/824/824718.png';
+};
 
   const toggleDropdown = (contentId) => {
     setDropdownOpen(dropdownOpen === contentId ? null : contentId);
@@ -398,6 +526,7 @@ const CourseCreator = () => {
       case 'video': return '🎬';
       case 'article': return '📄';
       case 'audio': return '🎧';
+      case 'document': return '📑';
       default: return '📑';
     }
   };
@@ -627,6 +756,7 @@ const CourseCreator = () => {
                         <option value="video">Video</option>
                         <option value="article">Article</option>
                         <option value="audio">Audio</option>
+                        <option value="document">Document</option>
                       </select>
                     </div>
                   </div>
@@ -655,6 +785,21 @@ const CourseCreator = () => {
                       rows="3"
                     />
                   </div>
+
+                  {newContent.type === 'document' && (
+                    <div className="form-group">
+                      <label htmlFor="content-file">Document File <span className="required">*</span></label>
+                      <input
+                        id="content-file"
+                        type="file"
+                        name="file"
+                        onChange={handleDocumentUpload}
+                        accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf"
+                        required={newContent.type === 'document'}
+                      />
+                      <small>Accepted formats: PDF, DOC, DOCX, PPT, PPTX, TXT, RTF (Max 10MB)</small>
+                    </div>
+                  )}
                   
                   <div className="form-row thumbnail-section">
                     <div className="form-group thumbnail-upload">

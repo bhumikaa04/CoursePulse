@@ -14,6 +14,9 @@ import CourseCreator from './components/CourseCreator.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import VideoPlayer from './components/VideoPlayer.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
+import EditProfilePage from './components/EditProfilePage.jsx'
+import { useContext } from 'react'
+import { AuthContext } from './context/AuthContext.jsx'
 
 function App() {
   return (
@@ -36,11 +39,13 @@ function App() {
           <Route path="/video-player" element={<VideoPlayer />} />
           <Route path="/video-player/:contentId" element={<VideoPlayer />} />
           <Route path="/video-player/:contentId/:type" element={<VideoPlayer />} />
+          <Route path="/edit-profile/:username" element={<EditProfilePage />} />
         </Routes>
       </BrowserRouter>  
     </AuthProvider>
     </>
   )
 }
+
 
 export default App
