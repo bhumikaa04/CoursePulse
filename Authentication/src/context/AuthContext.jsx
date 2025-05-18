@@ -5,53 +5,66 @@ export const AuthContext = createContext();
 
 // AuthProvider component to wrap your app
 export const AuthProvider = ({ children }) => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [username, setUsername] = useState(null);
-    const [userDetails, setUserDetails] = useState(null);
-    const [storedUser, setStoredUser] = useState(null);
-    const [profile, setProfile] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
+  const [storedUser, setStoredUser] = useState(null);
+  const [profile, setProfile] = useState(null);
 
-        const updateProfile = (newProfileData) => {
-          setProfile(prev => ({ ...prev, ...newProfileData }));
-        };
+  // Update profile and sync with localStorage
+  const updateProfile = (newProfileData) => {
+    setProfile((prev) => {
+      const updatedProfile = { ...prev, ...newProfileData };
 
-    // Load data from localStorage on app reload
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        const userFromStorage = localStorage.getItem("user");
-        const profileFromStorage = localStorage.getItem("profile");
+      // Save the updated profile to localStorage
+      localStorage.setItem("profile", JSON.stringify(updatedProfile));
 
-        // console.log("Stored User:", userFromStorage); // Log the stored user data
-        // console.log("Profile:", profileFromStorage); // Log the profile data
+      return updatedProfile;
+    });
+  };
 
-        if (token && userFromStorage) {
-            setIsLoggedIn(true);
-            const parsedUser = JSON.parse(userFromStorage);
-            setUserDetails(parsedUser);
-            setStoredUser(parsedUser);
-            setUsername(parsedUser.username);
-        }
+  // Load data from localStorage on app reload
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userFromStorage = localStorage.getItem("user");
+    const profileFromStorage = localStorage.getItem("profile");
 
-        if (profileFromStorage) {
-            setProfile(JSON.parse(profileFromStorage));
-        }
-    }, []);
+    // Log data for debugging (optional, remove for production)
+    // console.log("profileFromStorage:", profileFromStorage);
+    // console.log("userFromStorage:", userFromStorage);
+    // console.log("token:", token);
 
-    return (
-        <AuthContext.Provider value={{ 
-            isLoggedIn, 
-            setIsLoggedIn, 
-            username, 
-            setUsername, 
-            userDetails,
-            setUserDetails,
-            storedUser,
-            profile, 
-            updateProfile
-        }}>
-            {children}
-        </AuthContext.Provider>
-    );
+    if (token && userFromStorage) {
+      setIsLoggedIn(true);
+      const parsedUser = JSON.parse(userFromStorage);
+      setUserDetails(parsedUser);
+      setStoredUser(parsedUser);
+      setUsername(parsedUser.username);
+    }
+
+    if (profileFromStorage) {
+      setProfile(JSON.parse(profileFromStorage));
+    }
+  }, []);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        isLoggedIn,
+        setIsLoggedIn,
+        username,
+        setUsername,
+        userDetails,
+        setUserDetails,
+        storedUser,
+        profile,
+        updateProfile, // Provide updateProfile function in context
+        setProfile,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 // Hook for easy access to auth context

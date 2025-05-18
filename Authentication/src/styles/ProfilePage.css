@@ -1,123 +1,222 @@
-.profile-page {
+/* ProfilePage.css */
+.profile-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
   padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
+/* Loading and Error States */
+.profile-loading,
+.profile-error {
+  padding: 2rem;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.profile-error {
+  color: #e74c3c;
+}
+
+/* Profile Header Section */
 .profile-header {
   display: flex;
   align-items: center;
   gap: 2rem;
   width: 100%;
-  max-width: 800px;
-  padding: 1.5rem;
+  padding: 2rem;
   border-radius: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   background: #fff;
 }
 
+/* Profile Photo Styling */
 .profile-photo-container {
   position: relative;
-}
-
-.profile-photo-wrapper {
   width: 150px;
   height: 150px;
   border-radius: 10px;
-  padding: 0.5rem;
-  background: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: flex; /* Ensures children can be aligned */
-  justify-content: center; /* Horizontally center the image */
-  align-items: center; /* Vertically center the image */
+  flex-shrink: 0;
+}
+
+.profile-photo-wrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
 }
 
 .profile-photo-wrapper:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transform: scale(1.03);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .profile-photo {
   width: 140px;
   height: 140px;
+  border-radius: 10px;
   object-fit: cover;
-  border-radius: 10px ;
-  border: 2px solid #007bff;
+  border: 3px solid #4285f4;
+  display: block;
 }
 
+/* Profile Info Section */
 .profile-info {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
-.profile-top {
+.profile-top-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.edit-button {
+.profile-username {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  color: #2d3436;
+}
+
+.edit-profile-button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 8px;
-  background-color: #007bff;
+  background-color: #4285f4;
   color: white;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.2s ease;
 }
 
-.edit-button:hover {
-  background-color: #0056b3;
+.edit-profile-button:hover {
+  background-color: #3367d6;
+  transform: translateY(-1px);
+}
+
+.edit-icon {
+  font-size: 1.1rem;
+}
+
+.profile-name {
+  font-size: 1.3rem;
+  margin: 0;
+  color: #555;
+  font-weight: 500;
 }
 
 .profile-bio {
-  margin: 1rem 0;
+  margin: 0.5rem 0 0;
   color: #666;
-}
-
-.profile-stats {
-  display: flex;
-  gap: 1rem;
+  line-height: 1.5;
   font-size: 1rem;
 }
 
-.profile-stats span {
-  font-weight: bold;
-}
-
-.profile-content {
+/* Courses Section */
+.profile-courses-section {
   width: 100%;
-  max-width: 800px;
-  background: #fff;
-  padding: 1.5rem;
+  padding: 1.5rem 2rem;
   border-radius: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: #fff;
 }
 
-.courses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+.courses-section-title {
+  font-size: 1.5rem;
+  margin: 0 0 1.5rem;
+  color: #2d3436;
+  font-weight: 600;
 }
 
-.course-card {
-  background: #f9f9f9;
-  border-radius: 8px;
-  padding: 1rem;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.courses-stats-container {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
-.course-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+.course-stat-card {
+  flex: 1;
+  min-width: 150px;
+  padding: 1.2rem;
+  border-radius: 10px;
+  background: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.course-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.course-stat-title {
+  font-size: 0.95rem;
+  margin: 0 0 0.5rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.course-stat-value {
+  font-size: 1.8rem;
+  margin: 0;
+  color: #4285f4;
+  font-weight: 700;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .profile-top-row {
+    justify-content: center;
+  }
+
+  .profile-info {
+    align-items: center;
+    text-align: center;
+  }
+
+  .courses-stats-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .course-stat-card {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 1rem;
+  }
+  
+  .profile-photo-container {
+    width: 120px;
+    height: 120px;
+  }
 }

@@ -1,58 +1,129 @@
-"use client"
+import React, { useState, useEffect } from 'react';
+import { FiArrowRight, FiClock, FiBookOpen } from 'react-icons/fi';
+import '../styles/RecentActivity.css'; // Assuming you have a CSS file for styling
 
-import { FiBook, FiCheckCircle, FiAward } from "react-icons/fi"
-import dayjs from "dayjs"
-import relativeTime from "dayjs/plugin/relativeTime"
+const RecentActivity = () => {
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-dayjs.extend(relativeTime)
+  useEffect(() => {
+    // Simulating API call to fetch recent activities
+    const fetchActivities = async () => {
+      try {
+        setLoading(true);
+        
+        // This would be replaced with an actual API call
+        // await fetch('/api/activities')...
+        
+        // Simulated data
+        const mockActivities = [
+          {
+            id: 1,
+            type: 'course_progress',
+            title: 'Advanced React Patterns',
+            description: 'Completed Module 3: Context API',
+            timestamp: new Date(Date.now() - 3600000 * 2), // 2 hours ago
+            icon: 'book'
+          },
+          {
+            id: 2,
+            type: 'quiz_completed',
+            title: 'JavaScript Fundamentals',
+            description: 'Scored 90% on Week 2 Quiz',
+            timestamp: new Date(Date.now() - 3600000 * 8), // 8 hours ago
+            icon: 'award'
+          },
+          {
+            id: 3,
+            type: 'comment_received',
+            title: 'Discussion: Modern CSS',
+            description: 'Sarah replied to your comment',
+            timestamp: new Date(Date.now() - 3600000 * 24), // 1 day ago
+            icon: 'message'
+          },
+          {
+            id: 4,
+            type: 'course_enrollment',
+            title: 'Node.js Masterclass',
+            description: 'You enrolled in a new course',
+            timestamp: new Date(Date.now() - 3600000 * 48), // 2 days ago
+            icon: 'plus-circle'
+          }
+        ];
+        
+        setTimeout(() => {
+          setActivities(mockActivities);
+          setLoading(false);
+        }, 800);
+      } catch (error) {
+        console.error('Failed to fetch activities:', error);
+        setLoading(false);
+      }
+    };
 
-export default function RecentActivity() {
-  // Sample data - replace with API data
-  const activities = [
-    {
-      id: 1,
-      type: "course_completed",
-      title: "Advanced React Patterns",
-      icon: <FiCheckCircle />,
-      color: "#10b981",
-      timestamp: new Date(Date.now() - 3600000 * 2), // 2 hours ago
-    },
-    {
-      id: 2,
-      type: "course_started",
-      title: "Node.js Fundamentals",
-      icon: <FiBook />,
-      color: "#3b82f6",
-      timestamp: new Date(Date.now() - 3600000 * 8), // 8 hours ago
-    },
-    {
-      id: 3,
-      type: "achievement",
-      title: "5-Day Learning Streak",
-      icon: <FiAward />,
-      color: "#f59e0b",
-      timestamp: new Date(Date.now() - 3600000 * 24), // 1 day ago
-    },
-  ]
+    fetchActivities();
+  }, []);
+
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const diff = Math.floor((now - timestamp) / 1000); // difference in seconds
+    
+    if (diff < 60) return `${diff} sec ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    if (diff < 172800) return 'Yesterday';
+    return `${Math.floor(diff / 86400)} days ago`;
+  };
+
+  const getActivityIcon = (iconType) => {
+    switch(iconType) {
+      case 'book':
+        return <FiBookOpen className="activity-icon book" />;
+      case 'award':
+        return <FiClock className="activity-icon award" />;
+      default:
+        return <FiClock className="activity-icon default" />;
+    }
+  };
 
   return (
-    <div className="space-y-4">
-      {activities.map((activity) => (
-        <div key={activity.id} className="flex items-start gap-3 group">
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-            style={{ backgroundColor: `${activity.color}15`, color: activity.color }}
-          >
-            {activity.icon}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-              {activity.title}
-            </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{dayjs(activity.timestamp).fromNow()}</p>
-          </div>
+    <div className="recent-activity">
+      <h3>Recent Activity</h3>
+      
+      {loading ? (
+        <div className="activity-loading">
+          <div className="activity-skeleton"></div>
+          <div className="activity-skeleton"></div>
+          <div className="activity-skeleton"></div>
         </div>
-      ))}
+      ) : activities.length === 0 ? (
+        <div className="no-activity">
+          <p>No recent activity to show</p>
+        </div>
+      ) : (
+        <>
+          <ul className="activity-list">
+            {activities.map((activity) => (
+              <li key={activity.id} className="activity-item">
+                <div className="activity-icon-container">
+                  {getActivityIcon(activity.icon)}
+                </div>
+                <div className="activity-content">
+                  <h4>{activity.title}</h4>
+                  <p>{activity.description}</p>
+                  <span className="activity-time">{formatTimeAgo(activity.timestamp)}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+          
+          <button className="view-all-activity">
+            View All Activity <FiArrowRight />
+          </button>
+        </>
+      )}
     </div>
-  )
-}
+  );
+};
+
+export default RecentActivity;

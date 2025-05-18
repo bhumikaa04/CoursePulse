@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Line } from "react-chartjs-2"
+import React, { useEffect, useState, useContext } from "react";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,28 +12,38 @@ import {
   Tooltip,
   Legend,
   Filler,
-} from "chart.js"
-import { useTheme } from "next-themes"
+} from "chart.js";
+import { ThemeContext } from "../context/ThemeContext";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 export default function CourseProgressChart() {
-  const { theme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const { theme } = useContext(ThemeContext);
+  const [mounted, setMounted] = useState(false);
 
-  // After mounting, we can safely show the UI that depends on the theme
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
-  // Prevent hydration mismatch by not rendering theme-dependent UI until mounted
   if (!mounted) {
-    return <div className="h-[300px] flex items-center justify-center">Loading chart...</div>
+    return (
+      <div className="h-[300px] flex items-center justify-center">
+        Loading chart...
+      </div>
+    );
   }
 
-  const isDarkMode = theme === "dark"
+  const isDarkMode = theme === "dark";
 
-  // Sample data - replace with API data
   const progressData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     datasets: [
@@ -49,7 +59,7 @@ export default function CourseProgressChart() {
         pointHoverRadius: 6,
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -67,7 +77,9 @@ export default function CourseProgressChart() {
       tooltip: {
         mode: "index",
         intersect: false,
-        backgroundColor: isDarkMode ? "rgba(30, 41, 59, 0.8)" : "rgba(17, 24, 39, 0.8)",
+        backgroundColor: isDarkMode
+          ? "rgba(30, 41, 59, 0.8)"
+          : "rgba(17, 24, 39, 0.8)",
         padding: 10,
         cornerRadius: 4,
         titleFont: {
@@ -86,7 +98,9 @@ export default function CourseProgressChart() {
         min: 0,
         max: 100,
         grid: {
-          color: isDarkMode ? "rgba(71, 85, 105, 0.3)" : "rgba(226, 232, 240, 0.5)",
+          color: isDarkMode
+            ? "rgba(71, 85, 105, 0.3)"
+            : "rgba(226, 232, 240, 0.5)",
         },
         ticks: {
           callback: (value) => value + "%",
@@ -113,11 +127,12 @@ export default function CourseProgressChart() {
       axis: "x",
       intersect: false,
     },
-  }
+  };
 
   return (
     <div className="h-[300px]">
       <Line data={progressData} options={options} />
     </div>
-  )
+  );
 }
+

@@ -206,80 +206,6 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Autocomplete suggestions
-router.get('/suggestions', async (req, res) => {
-    try {
-      const { q } = req.query;
-      if (!q) return res.json([]);
-      
-      const suggestions = await Course.aggregate([
-        {
-          $search: {
-            index: 'autocomplete',
-            autocomplete: {
-              query: q,
-              path: 'title',
-              fuzzy: {
-                maxEdits: 1
-              }
-            }
-          }
-        },
-        { $limit: 5 },
-        { $project: { title: 1, _id: 0 } }
-      ]);
-      
-      res.json(suggestions.map(s => s.title));
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error' });
-    }
-  });
-  
-  // Full search with filters
-  router.get('/search', async (req, res) => {
-    try {
-      const { q, category, difficulty } = req.query;
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 10;
-      const skip = (page - 1) * limit;
-      
-      const query = {};
-      
-      if (q) {
-        query.$text = { $search: q };
-      }
-      
-      if (category && category !== 'all') {
-        query.category = category;
-      }
-      
-      if (difficulty && difficulty !== 'all') {
-        query.difficulty = difficulty;
-      }
-      
-      const courses = await Course.find(query)
-        .skip(skip)
-        .limit(limit)
-        .sort({ rating: -1, createdAt: -1 });
-        
-      const total = await Course.countDocuments(query);
-      
-      res.json({
-        data: courses,
-        meta: {
-          total,
-          page,
-          pages: Math.ceil(total / limit),
-          limit
-        }
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error' });
-    }
-  }); 
-
 // Route to fetch the profile by username
 router.get('/profile/:username', async (req, res) => {
     const { username } = req.params;
@@ -302,78 +228,6 @@ router.get('/profile/:username', async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
-
-// router.put("/profile/:username", async (req, res) => {
-//   const { username } = req.params;
-//   const { firstName, lastName, bio, profilePhoto } = req.body;
-
-//   try {
-//     const updatedProfile = await Profile.findOneAndUpdate(
-//       { username },
-//       { firstName, lastName, bio, profilePhoto },
-//       { new: true, runValidators: true } // Return updated doc
-//     );
-
-//     if (!updatedProfile) {
-//       return res.status(404).json({ error: "Profile not found" });
-//     }
-
-//     res.status(200).json(updatedProfile);
-//   } catch (err) {
-//     console.error("Error updating profile:", err);
-//     res.status(500).json({ error: "Failed to update profile" });
-//   }
-// });
-
-// Route to update the profile
-// app.get("/edit-profile/:username", async (req, res) => {
-//   const { username } = req.params;
-
-//   try {
-//     const profile = await Profile.findOne({ username });
-//     if (!profile) return res.status(404).send("Profile not found");
-//     res.status(200).json(profile);
-//   } catch (error) {
-//     console.error("Error fetching profile:", error);
-//     res.status(500).send("Internal server error");
-//   }
-// });
-
-// app.put("/edit-profile/:username", async (req, res) => {
-//   const { username } = req.params;
-//   const updatedData = req.body;
-
-//       // If profilePhoto is base64, process it
-//     if (updateData.profilePhoto && updateData.profilePhoto.startsWith('data:image')) {
-//       // Extract the base64 string and the image type
-//       const base64Data = updatedData.profilePhoto.split(',')[1];
-//       const imageType = updatedData.profilePhoto.split(';')[0].split(':')[1].split('/')[1]; // e.g., 'jpeg', 'png'
-//       // Generate a unique filename
-//       const filename = `${username}-profile.${imageType}`;
-//       const filePath = path.join(__dirname, 'uploads', filename); // Ensure 'uploads' directory exists
-//       // Write the base64 image to a file
-//       fs.writeFileSync(filePath, base64Data, { encoding: 'base64' });
-//       // Update the profile photo URL in the updateData
-//       updateData.profilePhoto = `/uploads/images/${filename}`; // Adjust the path as necessary for serving static files
-//     }
-
-//   try {
-//     const profile = await profileModel.findOneAndUpdate(
-//       { username },
-//       updatedData,
-//       { new: true }
-//     );
-
-//     if (!profile) return res.status(404).send("Profile not found");
-//     res.status(200).json(profile);
-//   } catch (error) {
-//     console.error("Error updating profile:", error);
-//     res.status(500).send("Internal server error");
-//   }
-// });
-
-
-// Configure storage for profile photos
 
 const profilePhotoStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -483,8 +337,6 @@ app.put("/edit-profile/:username", uploadProfilePhoto.single('profilePhoto'), as
   }
 });
 
-
-
 app.post('/create-course', async (req, res) => {
   try {
     const course = new Course(req.body);
@@ -494,110 +346,6 @@ app.post('/create-course', async (req, res) => {
     res.status(400).send(error);
   }
 });
-
-app.post('/create-course/save', authenticationToken, async (req, res) => {
-  try {
-    // Log the entire request body first
-    console.log('Full request body:', req.body);
-    const { course } = req.body;
-
-    // Detailed logging of the course data
-    console.log('Received course data:', {
-      title: course?.title,
-      hasContents: !!course?.contents,
-      contentsLength: course?.contents?.length || 0,
-      isUpdate: !!course?._id,
-      ownerEmail: req.user.email // From auth token
-    });
-
-    // Validate course data exists
-    if (!course) {
-      console.error('No course data received');
-      return res.status(400).json({ error: 'Missing course data' });
-    }
-
-    // Validate required fields
-    if (!course.title) {
-      console.error('Missing title in course data:', course);
-      return res.status(400).json({ error: 'Missing required title field' });
-    }
-
-    // Log contents if they exist
-    if (course.contents && course.contents.length > 0) {
-      console.log('Contents received:');
-      course.contents.forEach((content, index) => {
-        console.log(`Content ${index + 1}:`, {
-          title: content.title,
-          type: content.type,
-          url: content.url,
-          description: content.description?.length || 'No description',
-          thumbnail: content.thumbnail ? 'Has thumbnail' : 'No thumbnail'
-        });
-      });
-    } else {
-      console.log('No contents received or empty contents array');
-    }
-
-    let savedCourse;
-    let isNewCourse = false;
-
-    if (course._id) {
-      console.log('Processing course update for ID:', course._id);
-      
-      const existingCourse = await Course.findOne({ _id: course._id, ownerEmail: req.user.email });
-      if (!existingCourse) {
-        console.error('Course not found or unauthorized:', {
-          requestedId: course._id,
-          ownerEmail: req.user.email
-        });
-        return res.status(404).json({ error: 'Course not found or unauthorized' });
-      }
-
-      savedCourse = await Course.findOneAndUpdate(
-        { _id: course._id, ownerEmail: req.user.email },
-        {
-          $set: {
-            title: course.title,
-            contents: course.contents || [],
-            updatedAt: new Date(),
-          },
-        },
-        { new: true }
-      );
-      console.log('Course updated:', savedCourse);
-    } else {
-      console.log('Creating new course');
-      const newCourse = new Course({
-        title: course.title,
-        ownerEmail: req.user.email,
-        contents: course.contents || [],
-        published: false,
-      });
-      savedCourse = await newCourse.save();
-      isNewCourse = true;
-      console.log('New course created:', savedCourse);
-
-      // Increment courseCreated count for the user
-      await User.updateOne(
-        { email: req.user.email },
-        { $inc: { courseCreated: 1 } }
-      );
-      console.log('User course count incremented');
-    }
-
-    res.status(201).json(savedCourse);
-  } catch (err) {
-    console.error('Save error:', {
-      error: err.message,
-      stack: err.stack,
-      requestBody: req.body
-    });
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Get user courses
-
 
 // app.post('/create-course/save', authenticationToken, async (req, res) => {
 //   try {
@@ -643,6 +391,8 @@ app.post('/create-course/save', authenticationToken, async (req, res) => {
 //     }
 
 //     let savedCourse;
+//     let isNewCourse = false;
+
 //     if (course._id) {
 //       console.log('Processing course update for ID:', course._id);
       
@@ -676,20 +426,15 @@ app.post('/create-course/save', authenticationToken, async (req, res) => {
 //         published: false,
 //       });
 //       savedCourse = await newCourse.save();
+//       isNewCourse = true;
 //       console.log('New course created:', savedCourse);
 
-//       // Increment courseCreated count in user's profile
-//       try {
-//         const updatedProfile = await profileModel.findOneAndUpdate(
-//           { email: req.user.email },
-//           { $inc: { courseCreated: 1 } },
-//           { new: true }
-//         );
-//         console.log('Profile course count updated:', updatedProfile.courseCreated);
-//       } catch (profileErr) {
-//         console.error('Failed to update profile course count:', profileErr);
-//         // Continue even if profile update fails
-//       }
+//       // Increment courseCreated count for the user
+//       await User.updateOne(
+//         { email: req.user.email },
+//         { $inc: { courseCreated: 1 } }
+//       );
+//       console.log('User course count incremented');
 //     }
 
 //     res.status(201).json(savedCourse);
@@ -702,6 +447,111 @@ app.post('/create-course/save', authenticationToken, async (req, res) => {
 //     res.status(500).json({ error: 'Server error' });
 //   }
 // });
+
+app.post('/create-course/save', authenticationToken, async (req, res) => {
+  try {
+    // Log the entire request body
+    console.log('Full request body:', req.body);
+    const { course } = req.body;
+
+    // Detailed logging of the course data
+    console.log('Received course data:', {
+      title: course?.title,
+      hasContents: !!course?.contents,
+      contentsLength: course?.contents?.length || 0,
+      isUpdate: !!course?._id,
+      ownerEmail: req.user.email // From auth token
+    });
+
+    // Validate course data exists
+    if (!course) {
+      console.error('No course data received');
+      return res.status(400).json({ error: 'Missing course data' });
+    }
+
+    // Validate required fields
+    if (!course.title) {
+      console.error('Missing title in course data:', course);
+      return res.status(400).json({ error: 'Missing required title field' });
+    }
+
+    // Log contents if they exist
+    if (course.contents && course.contents.length > 0) {
+      console.log('Contents received:');
+      course.contents.forEach((content, index) => {
+        console.log(`Content ${index + 1}:`, {
+          title: content.title,
+          type: content.type,
+          url: content.url,
+          description: content.description?.length || 'No description',
+          thumbnail: content.thumbnail ? 'Has thumbnail' : 'No thumbnail'
+        });
+      });
+    } else {
+      console.log('No contents received or empty contents array');
+    }
+
+    let savedCourse;
+    let isNewCourse = false;
+
+    if (course._id) {
+      console.log('Processing course update for ID:', course._id);
+
+      const existingCourse = await Course.findOne({ _id: course._id, ownerEmail: req.user.email });
+      if (!existingCourse) {
+        console.error('Course not found or unauthorized:', {
+          requestedId: course._id,
+          ownerEmail: req.user.email
+        });
+        return res.status(404).json({ error: 'Course not found or unauthorized' });
+      }
+
+      savedCourse = await Course.findOneAndUpdate(
+        { _id: course._id, ownerEmail: req.user.email },
+        {
+          $set: {
+            title: course.title,
+            contents: course.contents || [],
+            updatedAt: new Date(),
+          },
+        },
+        { new: true }
+      );
+      console.log('Course updated:', savedCourse);
+    } else {
+      console.log('Creating new course');
+      const newCourse = new Course({
+        title: course.title,
+        ownerEmail: req.user.email,
+        contents: course.contents || [],
+        published: false,
+      });
+      savedCourse = await newCourse.save();
+      isNewCourse = true;
+      console.log('New course created:', savedCourse);
+
+    const updatedUser = await profileModel.findOne({ email: req.user.email });
+    console.log('Updated user profile:', updatedUser);
+    res.status(201).json({ course: savedCourse, user: updatedUser });
+
+    // Increment courseCreated count for the user
+      console.log('Incrementing courseCreated for user:', req.user.email);
+      const userUpdateResult = await profileModel.updateOne(
+        { username: req.user.username },
+        { $inc: { courseCreated: 1 } }
+      );
+      console.log('User update result:', userUpdateResult);
+    }
+  } catch (err) {
+    console.error('Save error:', {
+      error: err.message,
+      stack: err.stack,
+      requestBody: req.body
+    });
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 app.get('/courses', authenticateToken, async (req, res) => {
   try {
@@ -795,6 +645,112 @@ app.get("/recommended-courses", (req, res) => {
   res.json({ courses });
 });
 
+// app.get('/search', async (req, res) => {
+//   const { q } = req.query;
+
+//   if (!q) {
+//     return res.json({ courses: [], profiles: [] });
+//   }
+
+//   try {
+//     const courses = await Course.find({ title: { $regex: q, $options: 'i' } });
+//     const profiles = await User.find({ username: { $regex: q, $options: 'i' } });
+
+//     res.json({ courses, profiles });
+//   } catch (err) {
+//     res.status(500).send({ message: 'Error fetching search results.' });
+//   }
+// });
+
+// app.get('/search', async (req, res) => {
+//   const { q } = req.query;
+
+//   if (!q) {
+//     return res.json({ courses: [], profiles: [] });
+//   }
+
+//   try {
+//     const courses = await Course.find({ title: { $regex: q, $options: 'i' } });
+//     const profiles = await User.find({ username: { $regex: q, $options: 'i' } });
+
+//     return res.json({ courses, profiles });
+//   } catch (err) {
+//     console.error('Error fetching search results:', err.message); // Log error to the server console
+//     res.status(500).json({ message: 'Error fetching search results.' });
+//   }
+// });
+
+router.get('/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || q.trim() === '') {
+      return res.status(200).json({
+        courses: [],
+        profiles: []
+      });
+    }
+
+    // Search collections
+    const profiles = await profile.find({
+      username: { $regex: q, $options: 'i' }
+    }).limit(10);
+
+    const courses = await Course.find({
+      title: { $regex: q, $options: 'i' }
+    }).limit(10);
+
+    res.json({ profiles, courses });
+
+    console.log('Profiles:', profiles);
+    console.log('Courses:', courses);
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({
+      message: 'An error occurred during search',
+      error: error.message
+    });
+
+        // Always return JSON on error
+    res.status(500).json({
+      message: 'An error occurred during search',
+      error: error.message
+    });
+  }
+});
+
+
+router.get("/my-created-courses", authenticateToken, async (req, res) => {
+  try {
+    // Get the authenticated user's email from the token
+    const userEmail = req.user.email; 
+    
+    // Find only courses where ownerEmail matches the logged-in user's email
+    const userCourses = await Course.find({ ownerEmail: userEmail })
+      .select('-__v') // Exclude version key
+      .sort({ createdAt: -1 }); // Sort by newest first
+
+    if (!userCourses || userCourses.length === 0) {
+      return res.status(200).json({ 
+        message: "You haven't created any courses yet",
+        courses: [] 
+      });
+    }
+
+    res.status(200).json({ 
+      success: true,
+      count: userCourses.length,
+      courses: userCourses 
+    });
+
+  } catch (error) {
+    console.error("Error fetching user courses:", error);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to fetch your courses" 
+    });
+  }
+});
 
 // Use the router in the Express app
 app.use('/', router);

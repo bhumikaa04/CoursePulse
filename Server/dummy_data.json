@@ -1,0 +1,520 @@
+{
+    "authUsers": [
+        {
+            "email": "user121@example.com",
+            "username": "user121",
+            "password": "securepassword"
+        },
+        {
+            "email": "user102@example.com",
+            "username": "user102",
+            "password": "securepassword"
+        },
+        {
+            "email": "user109@example.com",
+            "username": "user109",
+            "password": "securepassword"
+        },
+        {
+            "email": "user649@example.com",
+            "username": "user649",
+            "password": "securepassword"
+        },
+        {
+            "email": "user322@example.com",
+            "username": "user322",
+            "password": "securepassword"
+        },
+        {
+            "email": "user414@example.com",
+            "username": "user414",
+            "password": "securepassword"
+        },
+        {
+            "email": "user719@example.com",
+            "username": "user719",
+            "password": "securepassword"
+        },
+        {
+            "email": "user845@example.com",
+            "username": "user845",
+            "password": "securepassword"
+        },
+        {
+            "email": "user837@example.com",
+            "username": "user837",
+            "password": "securepassword"
+        },
+        {
+            "email": "user615@example.com",
+            "username": "user615",
+            "password": "securepassword"
+        }
+    ],
+    "profiles": [
+        {
+            "username": "user121",
+            "firstName": "First20",
+            "middleName": "Middle51",
+            "lastName": "Last58",
+            "age": 48,
+            "bio": "This is the bio of user user121.",
+            "profilePhoto": "https://example.com/photos/user121.jpg",
+            "followers": 320,
+            "following": 290,
+            "courseCreated": 1,
+            "coursePublished": 5,
+            "courseEnrolled": 4
+        },
+        {
+            "username": "user102",
+            "firstName": "First31",
+            "middleName": "Middle85",
+            "lastName": "Last38",
+            "age": 42,
+            "bio": "This is the bio of user user102.",
+            "profilePhoto": "https://example.com/photos/user102.jpg",
+            "followers": 155,
+            "following": 338,
+            "courseCreated": 8,
+            "coursePublished": 2,
+            "courseEnrolled": 12
+        },
+        {
+            "username": "user109",
+            "firstName": "First14",
+            "middleName": "Middle31",
+            "lastName": "Last35",
+            "age": 41,
+            "bio": "This is the bio of user user109.",
+            "profilePhoto": "https://example.com/photos/user109.jpg",
+            "followers": 446,
+            "following": 41,
+            "courseCreated": 6,
+            "coursePublished": 0,
+            "courseEnrolled": 9
+        },
+        {
+            "username": "user649",
+            "firstName": "First81",
+            "middleName": "Middle97",
+            "lastName": "Last94",
+            "age": 46,
+            "bio": "This is the bio of user user649.",
+            "profilePhoto": "https://example.com/photos/user649.jpg",
+            "followers": 449,
+            "following": 305,
+            "courseCreated": 8,
+            "coursePublished": 3,
+            "courseEnrolled": 8
+        },
+        {
+            "username": "user322",
+            "firstName": "First46",
+            "middleName": "Middle5",
+            "lastName": "Last22",
+            "age": 21,
+            "bio": "This is the bio of user user322.",
+            "profilePhoto": "https://example.com/photos/user322.jpg",
+            "followers": 457,
+            "following": 200,
+            "courseCreated": 1,
+            "coursePublished": 1,
+            "courseEnrolled": 9
+        },
+        {
+            "username": "user414",
+            "firstName": "First88",
+            "middleName": "Middle52",
+            "lastName": "Last63",
+            "age": 47,
+            "bio": "This is the bio of user user414.",
+            "profilePhoto": "https://example.com/photos/user414.jpg",
+            "followers": 460,
+            "following": 64,
+            "courseCreated": 8,
+            "coursePublished": 1,
+            "courseEnrolled": 10
+        },
+        {
+            "username": "user719",
+            "firstName": "First79",
+            "middleName": "Middle93",
+            "lastName": "Last6",
+            "age": 52,
+            "bio": "This is the bio of user user719.",
+            "profilePhoto": "https://example.com/photos/user719.jpg",
+            "followers": 487,
+            "following": 132,
+            "courseCreated": 6,
+            "coursePublished": 0,
+            "courseEnrolled": 10
+        },
+        {
+            "username": "user845",
+            "firstName": "First88",
+            "middleName": "Middle39",
+            "lastName": "Last98",
+            "age": 47,
+            "bio": "This is the bio of user user845.",
+            "profilePhoto": "https://example.com/photos/user845.jpg",
+            "followers": 345,
+            "following": 228,
+            "courseCreated": 3,
+            "coursePublished": 5,
+            "courseEnrolled": 6
+        },
+        {
+            "username": "user837",
+            "firstName": "First81",
+            "middleName": "Middle54",
+            "lastName": "Last31",
+            "age": 58,
+            "bio": "This is the bio of user user837.",
+            "profilePhoto": "https://example.com/photos/user837.jpg",
+            "followers": 166,
+            "following": 227,
+            "courseCreated": 4,
+            "coursePublished": 1,
+            "courseEnrolled": 14
+        },
+        {
+            "username": "user615",
+            "firstName": "First54",
+            "middleName": "Middle42",
+            "lastName": "Last27",
+            "age": 55,
+            "bio": "This is the bio of user user615.",
+            "profilePhoto": "https://example.com/photos/user615.jpg",
+            "followers": 319,
+            "following": 30,
+            "courseCreated": 10,
+            "coursePublished": 3,
+            "courseEnrolled": 11
+        }
+    ],
+    "courses": [
+        {
+            "title": "Course 38",
+            "ownerEmail": "user121@example.com",
+            "contents": [
+                {
+                    "title": "Content 62",
+                    "type": "article",
+                    "url": "https://example.com/content/822",
+                    "description": "Description for content 59",
+                    "thumbnail": "https://example.com/thumbnails/26.jpg"
+                },
+                {
+                    "title": "Content 5",
+                    "type": "podcast",
+                    "url": "https://example.com/content/806",
+                    "description": "Description for content 82",
+                    "thumbnail": "https://example.com/thumbnails/46.jpg"
+                },
+                {
+                    "title": "Content 23",
+                    "type": "podcast",
+                    "url": "https://example.com/content/917",
+                    "description": "Description for content 73",
+                    "thumbnail": "https://example.com/thumbnails/37.jpg"
+                }
+            ],
+            "published": false
+        },
+        {
+            "title": "Course 9",
+            "ownerEmail": "user102@example.com",
+            "contents": [
+                {
+                    "title": "Content 1",
+                    "type": "article",
+                    "url": "https://example.com/content/504",
+                    "description": "Description for content 56",
+                    "thumbnail": "https://example.com/thumbnails/85.jpg"
+                },
+                {
+                    "title": "Content 8",
+                    "type": "video",
+                    "url": "https://example.com/content/656",
+                    "description": "Description for content 85",
+                    "thumbnail": "https://example.com/thumbnails/60.jpg"
+                },
+                {
+                    "title": "Content 32",
+                    "type": "podcast",
+                    "url": "https://example.com/content/839",
+                    "description": "Description for content 39",
+                    "thumbnail": "https://example.com/thumbnails/56.jpg"
+                },
+                {
+                    "title": "Content 96",
+                    "type": "video",
+                    "url": "https://example.com/content/682",
+                    "description": "Description for content 20",
+                    "thumbnail": "https://example.com/thumbnails/36.jpg"
+                }
+            ],
+            "published": true
+        },
+        {
+            "title": "Course 80",
+            "ownerEmail": "user109@example.com",
+            "contents": [
+                {
+                    "title": "Content 96",
+                    "type": "article",
+                    "url": "https://example.com/content/264",
+                    "description": "Description for content 24",
+                    "thumbnail": "https://example.com/thumbnails/44.jpg"
+                },
+                {
+                    "title": "Content 98",
+                    "type": "video",
+                    "url": "https://example.com/content/500",
+                    "description": "Description for content 9",
+                    "thumbnail": "https://example.com/thumbnails/37.jpg"
+                },
+                {
+                    "title": "Content 64",
+                    "type": "podcast",
+                    "url": "https://example.com/content/351",
+                    "description": "Description for content 70",
+                    "thumbnail": "https://example.com/thumbnails/87.jpg"
+                },
+                {
+                    "title": "Content 94",
+                    "type": "video",
+                    "url": "https://example.com/content/603",
+                    "description": "Description for content 30",
+                    "thumbnail": "https://example.com/thumbnails/38.jpg"
+                }
+            ],
+            "published": false
+        },
+        {
+            "title": "Course 34",
+            "ownerEmail": "user649@example.com",
+            "contents": [
+                {
+                    "title": "Content 32",
+                    "type": "video",
+                    "url": "https://example.com/content/699",
+                    "description": "Description for content 92",
+                    "thumbnail": "https://example.com/thumbnails/85.jpg"
+                },
+                {
+                    "title": "Content 1",
+                    "type": "article",
+                    "url": "https://example.com/content/617",
+                    "description": "Description for content 92",
+                    "thumbnail": "https://example.com/thumbnails/47.jpg"
+                },
+                {
+                    "title": "Content 55",
+                    "type": "podcast",
+                    "url": "https://example.com/content/595",
+                    "description": "Description for content 68",
+                    "thumbnail": "https://example.com/thumbnails/82.jpg"
+                }
+            ],
+            "published": true
+        },
+        {
+            "title": "Course 23",
+            "ownerEmail": "user322@example.com",
+            "contents": [
+                {
+                    "title": "Content 36",
+                    "type": "video",
+                    "url": "https://example.com/content/716",
+                    "description": "Description for content 55",
+                    "thumbnail": "https://example.com/thumbnails/76.jpg"
+                },
+                {
+                    "title": "Content 15",
+                    "type": "video",
+                    "url": "https://example.com/content/175",
+                    "description": "Description for content 53",
+                    "thumbnail": "https://example.com/thumbnails/19.jpg"
+                },
+                {
+                    "title": "Content 59",
+                    "type": "video",
+                    "url": "https://example.com/content/496",
+                    "description": "Description for content 80",
+                    "thumbnail": "https://example.com/thumbnails/54.jpg"
+                }
+            ],
+            "published": false
+        },
+        {
+            "title": "Course 30",
+            "ownerEmail": "user414@example.com",
+            "contents": [
+                {
+                    "title": "Content 81",
+                    "type": "video",
+                    "url": "https://example.com/content/963",
+                    "description": "Description for content 79",
+                    "thumbnail": "https://example.com/thumbnails/48.jpg"
+                },
+                {
+                    "title": "Content 57",
+                    "type": "video",
+                    "url": "https://example.com/content/519",
+                    "description": "Description for content 58",
+                    "thumbnail": "https://example.com/thumbnails/3.jpg"
+                },
+                {
+                    "title": "Content 30",
+                    "type": "podcast",
+                    "url": "https://example.com/content/880",
+                    "description": "Description for content 7",
+                    "thumbnail": "https://example.com/thumbnails/70.jpg"
+                },
+                {
+                    "title": "Content 58",
+                    "type": "video",
+                    "url": "https://example.com/content/458",
+                    "description": "Description for content 81",
+                    "thumbnail": "https://example.com/thumbnails/29.jpg"
+                }
+            ],
+            "published": true
+        },
+        {
+            "title": "Course 95",
+            "ownerEmail": "user719@example.com",
+            "contents": [
+                {
+                    "title": "Content 79",
+                    "type": "article",
+                    "url": "https://example.com/content/755",
+                    "description": "Description for content 5",
+                    "thumbnail": "https://example.com/thumbnails/94.jpg"
+                },
+                {
+                    "title": "Content 40",
+                    "type": "video",
+                    "url": "https://example.com/content/673",
+                    "description": "Description for content 48",
+                    "thumbnail": "https://example.com/thumbnails/43.jpg"
+                },
+                {
+                    "title": "Content 86",
+                    "type": "podcast",
+                    "url": "https://example.com/content/45",
+                    "description": "Description for content 35",
+                    "thumbnail": "https://example.com/thumbnails/67.jpg"
+                },
+                {
+                    "title": "Content 61",
+                    "type": "podcast",
+                    "url": "https://example.com/content/244",
+                    "description": "Description for content 80",
+                    "thumbnail": "https://example.com/thumbnails/96.jpg"
+                }
+            ],
+            "published": false
+        },
+        {
+            "title": "Course 64",
+            "ownerEmail": "user845@example.com",
+            "contents": [
+                {
+                    "title": "Content 98",
+                    "type": "video",
+                    "url": "https://example.com/content/556",
+                    "description": "Description for content 87",
+                    "thumbnail": "https://example.com/thumbnails/40.jpg"
+                },
+                {
+                    "title": "Content 36",
+                    "type": "video",
+                    "url": "https://example.com/content/200",
+                    "description": "Description for content 53",
+                    "thumbnail": "https://example.com/thumbnails/44.jpg"
+                },
+                {
+                    "title": "Content 7",
+                    "type": "podcast",
+                    "url": "https://example.com/content/259",
+                    "description": "Description for content 43",
+                    "thumbnail": "https://example.com/thumbnails/16.jpg"
+                }
+            ],
+            "published": true
+        },
+        {
+            "title": "Course 57",
+            "ownerEmail": "user837@example.com",
+            "contents": [
+                {
+                    "title": "Content 65",
+                    "type": "podcast",
+                    "url": "https://example.com/content/367",
+                    "description": "Description for content 2",
+                    "thumbnail": "https://example.com/thumbnails/98.jpg"
+                },
+                {
+                    "title": "Content 27",
+                    "type": "video",
+                    "url": "https://example.com/content/728",
+                    "description": "Description for content 29",
+                    "thumbnail": "https://example.com/thumbnails/54.jpg"
+                },
+                {
+                    "title": "Content 7",
+                    "type": "article",
+                    "url": "https://example.com/content/447",
+                    "description": "Description for content 18",
+                    "thumbnail": "https://example.com/thumbnails/95.jpg"
+                },
+                {
+                    "title": "Content 76",
+                    "type": "video",
+                    "url": "https://example.com/content/823",
+                    "description": "Description for content 76",
+                    "thumbnail": "https://example.com/thumbnails/8.jpg"
+                }
+            ],
+            "published": false
+        },
+        {
+            "title": "Course 23",
+            "ownerEmail": "user615@example.com",
+            "contents": [
+                {
+                    "title": "Content 52",
+                    "type": "video",
+                    "url": "https://example.com/content/673",
+                    "description": "Description for content 61",
+                    "thumbnail": "https://example.com/thumbnails/93.jpg"
+                },
+                {
+                    "title": "Content 46",
+                    "type": "article",
+                    "url": "https://example.com/content/998",
+                    "description": "Description for content 55",
+                    "thumbnail": "https://example.com/thumbnails/88.jpg"
+                },
+                {
+                    "title": "Content 3",
+                    "type": "video",
+                    "url": "https://example.com/content/91",
+                    "description": "Description for content 97",
+                    "thumbnail": "https://example.com/thumbnails/66.jpg"
+                },
+                {
+                    "title": "Content 26",
+                    "type": "podcast",
+                    "url": "https://example.com/content/73",
+                    "description": "Description for content 42",
+                    "thumbnail": "https://example.com/thumbnails/46.jpg"
+                }
+            ],
+            "published": false
+        }
+    ]
+}

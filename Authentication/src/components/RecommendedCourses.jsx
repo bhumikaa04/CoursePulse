@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
-import { FiStar } from "react-icons/fi"
+import React from "react";
+import { FiStar } from "react-icons/fi";
 
 export default function RecommendedCourses() {
   // Sample data - replace with API data
@@ -26,7 +27,7 @@ export default function RecommendedCourses() {
       rating: 4.7,
       thumbnail: "/placeholder.svg?height=60&width=80",
     },
-  ]
+  ];
 
   return (
     <div className="space-y-3">
@@ -46,14 +47,18 @@ export default function RecommendedCourses() {
             <h4 className="font-medium text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
               {course.title}
             </h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">{course.description}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">
+              {course.description}
+            </p>
             <div className="flex items-center gap-1 mt-1.5">
               <FiStar className="text-yellow-500 h-3.5 w-3.5 fill-yellow-500" />
-              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{course.rating}</span>
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                {course.rating}
+              </span>
             </div>
           </div>
         </div>
       ))}
     </div>
-  )
+  );
 }

@@ -8,7 +8,7 @@ const contentSchema = new Schema({
   },
   type: { 
     type: String, 
-    enum: ['video', 'article', 'podcast'], 
+    enum: ['video', 'article', 'audio' , 'document'], 
     required: true 
   },
   url: { 

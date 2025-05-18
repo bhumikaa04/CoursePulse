@@ -6,9 +6,9 @@ import VideoPlayer from './VideoPlayer';
 import { useAuth } from '../context/AuthContext'; // Assuming you have an AuthContext for user authentication
 
 const CourseCreator = () => {
-  // const { userDetails } = useContext(AuthContext);
   const { storedUser, profile , username } = useAuth();
   const {profile: storedProfile } = useContext(AuthContext);
+  console.log('profile:', profile);
   const [profileData, setProfileData] = useState(storedProfile || {});
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(null);
