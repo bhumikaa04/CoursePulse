@@ -37,6 +37,7 @@ useEffect(() => {
       }
 
       const contentType = response.headers.get("content-type");
+      console.log(contentType) ; 
       if (!contentType || !contentType.includes("application/json")) {
         throw new Error("Invalid JSON response");
       }

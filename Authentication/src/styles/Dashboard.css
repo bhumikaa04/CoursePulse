@@ -15,7 +15,7 @@
   --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   --hover-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   --sidebar-width: 250px;
-  --sidebar-collapsed-width: 80px;
+  --sidebar-collapsed-width: 100px;
   --header-height: 70px;
   --transition-speed: 0.3s;
 }
@@ -134,6 +134,41 @@ body {
   color: #4285f4;
   font-size: 1.2rem;
 }
+
+/* Shared styles for all sidebar items */
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: var(--medium-text);
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.sidebar-item span {
+    margin-left: 10px;
+}
+
+.sidebar-nav li.active button {
+  background-color: rgba(67, 97, 238, 0.1);
+  color: var(--primary-color);
+  border-left-color: var(--primary-color);
+}
+
+.sidebar-nav button:hover {
+  background-color: rgba(67, 97, 238, 0.05);
+  color: var(--primary-color);
+}
+
+/* Specific styles for list items (if necessary) */
+.sidebar-list-item {
+    list-style: none;
+}
+
 
 .user-info {
   display: flex;
@@ -649,4 +684,19 @@ body {
 
 .dashboard-main::-webkit-scrollbar-thumb:hover {
   background: #aaa;
+}
+
+.sidebar-nav-button {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  color: var(--medium-text);
+  text-decoration: none; /* buttons don’t usually have this but no harm */
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  font: inherit; /* keep font consistent */
 }

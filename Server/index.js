@@ -682,6 +682,8 @@ app.get("/recommended-courses", (req, res) => {
 
 router.get('/search', async (req, res) => {
   try {
+
+    console.log('q : ', req.query); 
     const { q } = req.query;
 
     if (!q || q.trim() === '') {
@@ -691,8 +693,8 @@ router.get('/search', async (req, res) => {
       });
     }
 
-    // Search collections
-    const profiles = await profile.find({
+    // Perform search in collections
+    const profiles = await profileModel.find({
       username: { $regex: q, $options: 'i' }
     }).limit(10);
 
@@ -700,18 +702,13 @@ router.get('/search', async (req, res) => {
       title: { $regex: q, $options: 'i' }
     }).limit(10);
 
-    res.json({ profiles, courses });
+    console.log('profiles : ' , profiles) ;
+    console.log('courses : ' , courses); 
 
-    console.log('Profiles:', profiles);
-    console.log('Courses:', courses);
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).json({ profiles, courses });
   } catch (error) {
     console.error('Search error:', error);
-    res.status(500).json({
-      message: 'An error occurred during search',
-      error: error.message
-    });
-
-        // Always return JSON on error
     res.status(500).json({
       message: 'An error occurred during search',
       error: error.message
@@ -749,6 +746,32 @@ router.get("/my-created-courses", authenticateToken, async (req, res) => {
       success: false,
       error: "Failed to fetch your courses" 
     });
+  }
+});
+
+// Route to fetch created and enrolled courses for a user
+router.get("/my-courses", authenticateToken , async (req, res) => {
+  try {
+    const userEmail = req.user.email; // Extract the email from the authenticated user
+    const userProfile = await profileModel.findOne({ username: req.user.username });
+
+    if (!userProfile) {
+      return res.status(404).json({ message: "User profile not found" });
+    }
+
+    // Fetch courses created by the user
+    const createdCourses = await Course.find({ ownerEmail: userEmail });
+
+    // Fetch courses where the user is enrolled
+    const enrolledCourses = await Course.find({ "contents.ownerEmail": userEmail });
+
+    res.status(200).json({
+      createdCourses,
+      enrolledCourses,
+    });
+  } catch (err) {
+    console.error("Error fetching courses:", err);
+    res.status(500).json({ message: "Failed to fetch courses" });
   }
 });
 

@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
 
   // Update profile and sync with localStorage
   const updateProfile = (newProfileData) => {
+    console.log("Updating profile with:", newProfileData); // Debugging log
     setProfile((prev) => {
       const updatedProfile = { ...prev, ...newProfileData };
 

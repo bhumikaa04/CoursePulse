@@ -14,11 +14,9 @@ import ProfilePage from './pages/ProfilePage.jsx'
 import VideoPlayer from './components/VideoPlayer.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import EditProfilePage from './components/EditProfilePage.jsx'
-import { useContext } from 'react'
-import { AuthContext } from './context/AuthContext.jsx'
-import { ThemeContext } from './context/ThemeContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import MyCourses from './components/MyCourses.jsx'
+import AllCoursesPage from './components/AllCoursesPage.jsx'
 
 function App() {
   return (
@@ -44,6 +42,7 @@ function App() {
           <Route path="/video-player/:contentId/:type" element={<VideoPlayer />} />
           <Route path="/edit-profile/:username" element={<EditProfilePage />} />
           <Route path="/my-created-courses" element={<MyCourses />} />
+          <Route path='/my-courses' element= {<AllCoursesPage/>} />
         </Routes>
       </BrowserRouter>  
     </ThemeProvider>

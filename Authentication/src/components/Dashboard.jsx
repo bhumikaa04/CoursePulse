@@ -18,16 +18,19 @@ import {
   FiArrowRight,
   FiRefreshCw,
   FiSearch, 
-  FiMenu
+  FiMenu, 
+  FiUser, 
+  FiLogOut
 } from "react-icons/fi";
 import CourseProgressChart from "./CourseProgressChart";
 import RecentActivity from "./RecentActivity";
 import RecommendedCourses from "./RecommendedCourses";
 import StatCard from "./StatCard";
 import "../styles/Dashboard.css"; // Import CSS for styling
+import LogoutButton from "./Logout";
 
 const Dashboard = () => {
-  const { profile, setIsLoggedIn } = useContext(AuthContext);
+  const { profile, updateProfile, setIsLoggedIn , username} = useContext(AuthContext);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -50,7 +53,7 @@ const Dashboard = () => {
 
   useEffect(() => {
 
-    console.log('profile: ' , profile); 
+    console.log('profile in Dashboard: ' , profile); 
 
     const fetchDashboardData = async () => {
       const token = localStorage.getItem("token");
@@ -65,6 +68,7 @@ const Dashboard = () => {
         const response = await fetch("http://localhost:3001/dashboard", {
           headers: { Authorization: `Bearer ${token}` },
         });
+    
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
@@ -229,6 +233,15 @@ const Dashboard = () => {
                   {!sidebarCollapsed && <span>Achievements</span>}
                 </a>
               </li>
+              <li>
+                <Link to={`/profile/${username}`}>
+                  <FiUser />
+                  {!sidebarCollapsed && <span>Profile</span>}
+                </Link>
+              </li>
+              {/* <li className="sidebar-list-item">
+                <LogoutButton sidebarCollapsed={sidebarCollapsed} />
+              </li> */}
             </ul>
           </nav>
           
@@ -373,7 +386,7 @@ const Dashboard = () => {
                 <RecentActivity />
               </div>
               
-              <div className="quick-stats">
+              {/* <div className="quick-stats">
                 <h3>Quick Stats</h3>
                 <div className="quick-stat-item">
                   <FiStar />
@@ -396,7 +409,7 @@ const Dashboard = () => {
                     <span>8</span>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </main>

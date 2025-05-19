@@ -12,7 +12,6 @@ import {
 } from "react-icons/fi";
 import "../styles/MyCourses.css";
 
-
 const MyCourses = () => {
   const { setIsLoggedIn } = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
@@ -86,9 +85,7 @@ const MyCourses = () => {
     return (
       <div className="my-courses">
         <div className="empty-container">
-          <FiBook className="empty-icon" />
-          <h2>No Courses Yet</h2>
-          <p>You haven't created any courses yet. Ready to start your teaching journey?</p>
+          <h2>You haven't made any courses yet! 😞</h2>
           <button 
             className="btn-primary"
             onClick={() => navigate("/create-course")}

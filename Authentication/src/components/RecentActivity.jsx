@@ -88,7 +88,6 @@ const RecentActivity = () => {
 
   return (
     <div className="recent-activity">
-      <h3>Recent Activity</h3>
       
       {loading ? (
         <div className="activity-loading">

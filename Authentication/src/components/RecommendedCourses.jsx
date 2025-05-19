@@ -11,51 +11,64 @@ export default function RecommendedCourses() {
       title: "React Hooks Masterclass",
       description: "Deep dive into modern React patterns",
       rating: 4.8,
-      thumbnail: "/placeholder.svg?height=60&width=80",
     },
     {
       id: 2,
       title: "Advanced JavaScript Concepts",
       description: "Master closures, prototypes and async patterns",
       rating: 4.6,
-      thumbnail: "/placeholder.svg?height=60&width=80",
     },
     {
       id: 3,
       title: "TypeScript Fundamentals",
       description: "Type-safe JavaScript development",
       rating: 4.7,
-      thumbnail: "/placeholder.svg?height=60&width=80",
     },
   ];
 
   return (
-    <div className="space-y-3">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       {recommendedCourses.map((course) => (
         <div
           key={course.id}
-          className="flex gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors group cursor-pointer"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            padding: "1rem",
+            borderRadius: "8px",
+            backgroundColor: "#f9f9f9",
+            transition: "background-color 0.3s",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#e0f7fa")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#f9f9f9")}
         >
-          <div className="w-20 h-15 rounded-md overflow-hidden flex-shrink-0">
-            <img
-              src={course.thumbnail || "/placeholder.svg"}
-              alt={course.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-              {course.title}
-            </h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">
-              {course.description}
-            </p>
-            <div className="flex items-center gap-1 mt-1.5">
-              <FiStar className="text-yellow-500 h-3.5 w-3.5 fill-yellow-500" />
-              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                {course.rating}
-              </span>
-            </div>
+          <h4
+            style={{
+              fontSize: "1.2rem",
+              fontWeight: "bold",
+              color: "#333",
+              margin: 0,
+              marginBottom: "0.5rem",
+            }}
+          >
+            {course.title}
+          </h4>
+          <p
+            style={{
+              fontSize: "0.9rem",
+              color: "#666",
+              margin: 0,
+              marginBottom: "0.75rem",
+            }}
+          >
+            {course.description}
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+            <FiStar style={{ color: "#ffc107", width: "16px", height: "16px" }} />
+            <span style={{ fontSize: "0.9rem", fontWeight: "500", color: "#444" }}>
+              {course.rating}
+            </span>
           </div>
         </div>
       ))}

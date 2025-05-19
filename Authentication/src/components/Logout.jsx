@@ -2,8 +2,9 @@ import React from "react";
 import { useContext } from "react"; 
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { FiLogOut } from "react-icons/fi";
 
-function LogoutButton() {
+function LogoutButton({ sidebarCollapsed }) {
     const { setIsLoggedIn } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -18,9 +19,11 @@ function LogoutButton() {
         setIsLoggedIn(false);
         navigate("/login");
     };
+
     return (
-        <button onClick={handleLogout} className="btn logout-button">
-            Logout
+        <button onClick={handleLogout} className="sidebar-item">
+            <FiLogOut />
+            {!sidebarCollapsed && <span>Logout</span>}
         </button>
     );
 }
