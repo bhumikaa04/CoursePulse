@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/SearchComponent.css";
+import { Link } from "react-router-dom";
 
 const SearchComponent = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,42 +20,34 @@ const SearchComponent = () => {
   }, [searchQuery]);
 
   // Fetch search results when the debounced query changes
-useEffect(() => {
-  const fetchResults = async () => {
-    if (!debouncedQuery) {
-      setSearchResults({ courses: [], profiles: [] });
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`/search?q=${encodeURIComponent(debouncedQuery)}`);
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (!debouncedQuery) {
+        setSearchResults({ courses: [], profiles: [] });
+        return;
       }
 
-      const contentType = response.headers.get("content-type");
-      console.log(contentType) ; 
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Invalid JSON response");
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`http://localhost:3001/search?q=${encodeURIComponent(debouncedQuery)}`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setSearchResults(data);
+      } catch (err) {
+        console.error("Search fetch error:", err.message);
+        setError(err.message || "An error occurred. Please try again.");
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      const data = await response.json();
-      setSearchResults(data);
-    } catch (err) {
-      console.error("Search fetch error:", err.message);
-      setError(err.message || "An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  fetchResults();
-}, [debouncedQuery]);
-
+    fetchResults();
+  }, [debouncedQuery]);
 
   const handleClearSearch = () => {
     setSearchQuery("");
@@ -101,7 +94,7 @@ useEffect(() => {
           <Section title="Profiles">
             <CardsList
               items={searchResults.profiles}
-              renderItem={(profile) => <ProfileCard key={profile.username} profile={profile} />}
+              renderItem={(profile) => <ProfileCard key={profile.username || profile._id} profile={profile} />}
             />
           </Section>
         )}
@@ -109,7 +102,7 @@ useEffect(() => {
           <Section title="Courses">
             <CardsList
               items={searchResults.courses}
-              renderItem={(course) => <CourseCard key={course.id} course={course} />}
+              renderItem={(course) => <CourseCard key={course.id || course._id} course={course} />}
             />
           </Section>
         )}
@@ -161,11 +154,25 @@ const CardsList = ({ items, renderItem }) => (
 const ProfileCard = ({ profile }) => (
   <div className="card profile-card">
     <div className="card-content">
-      <h4>{profile.name}</h4>
-      <p>@{profile.username}</p>
-      <button onClick={() => (window.location.href = `/profile/${profile.username}`)}>
-        View Profile
-      </button>
+      {/* Image and Name Section */}
+      <div className="profile-header">
+        <img
+          src={profile.profilePhoto || "default-profile.png"} // Fallback to a default image
+          alt={`${profile.name}'s profile`}
+          className="profile-image"
+        />
+        <div className="profile-info">
+          <h4>{profile.name || "Unknown Name"}</h4>
+          <p>@{profile.ownerEmail || "Unknown Email"}</p>
+        </div>
+      </div>
+
+      {/* Button Section */}
+      <div className="profile-button">
+        <Link to={`/profile/${profile.username || profile._id}`} className="button-link">
+          Go to Profile
+        </Link>
+      </div>
     </div>
   </div>
 );
@@ -173,9 +180,9 @@ const ProfileCard = ({ profile }) => (
 const CourseCard = ({ course }) => (
   <div className="card course-card">
     <div className="card-content">
-      <h4>{course.title}</h4>
-      <p>{course.description}</p>
-      <span>By {course.instructor}</span>
+      <h4>{course.title || "Untitled Course"}</h4>
+      <p>{course.description || "No description available."}</p>
+      <span>By {course.instructor || "Unknown Instructor"}</span>
     </div>
   </div>
 );
