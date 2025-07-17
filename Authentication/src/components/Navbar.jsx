@@ -1,8 +1,7 @@
 import React, { useState , useContext} from "react";
 import { Link , useParams } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa"; // Profile Icon
-import "../styles/style.css";
-import LogoutButton from "./Logout"; // Import the LogoutButton component
+import "../styles/style.css"; // Import the LogoutButton component
 import { AuthContext } from "../context/AuthContext";
 import { useAuth } from "../context/AuthContext"; // Import the useAuth hook
 
@@ -42,37 +41,10 @@ const Navbar = () => {
                     <li>
                         <Link to={isLoggedIn ? "/create-course" : "/login"}>Create Course</Link>
                     </li>
-
-                    {isLoggedIn && (
-                        <>
-                            <li>
-                                <Link to="/search">Search</Link>
-                            </li>
-                        </>
-                    )}
                 </ul>
 
                 {/* Profile or Login/Signup Button */}
                 <div className="profile">
-                    {isLoggedIn ? (
-                        <div
-                        className="profile-dropdown"
-                        onMouseEnter={() => setIsDropdownOpen(true)}
-                        onMouseLeave={() => setIsDropdownOpen(false)}
-                      >
-                        <FaUserCircle size={40} className="profile-icon" />
-                        {isDropdownOpen && (
-                          <ul className="dropdown-menu">
-                            <li>
-                              <Link to={`/profile/${username}`}>View Profile</Link>
-                            </li>
-                            <li>
-                              <LogoutButton />
-                            </li>
-                          </ul>
-                        )}
-                      </div>
-                    ) : (
                         <div className="auth-buttons">
                             <Link to="/login" className="auth-button">
                                 Login
@@ -81,7 +53,6 @@ const Navbar = () => {
                                 Signup
                             </Link>
                         </div>
-                    )}
                 </div>
             </div>
         </nav>

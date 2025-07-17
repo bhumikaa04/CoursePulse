@@ -9,21 +9,23 @@ import OuterHome from './components/OuterHome.jsx'
 import Explore from './components/Explore.jsx'
 import {BrowserRouter , Routes , Route} from 'react-router-dom'
 import SearchComponent from './components/SearchComponent.jsx'
-import CourseCreator from './components/CourseCreator.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import VideoPlayer from './components/VideoPlayer.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import EditProfilePage from './components/EditProfilePage.jsx'
-import { ThemeProvider } from './context/ThemeContext.jsx'
 import MyCourses from './components/MyCourses.jsx'
 import AllCoursesPage from './components/AllCoursesPage.jsx'
+import {NotificationProvider} from './context/NotificationContext.jsx'
+import NewCourse from './pages/NewCourse.jsx'
+import CourseComponent from './components/CourseComponent.jsx'
+
 
 function App() {
   return (
     
     <>
+    <NotificationProvider>
     <AuthProvider>
-    <ThemeProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -35,7 +37,6 @@ function App() {
           <Route path="/OuterHome" element={<OuterHome />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/search" element={<SearchComponent />} />
-          <Route path="/create-course" element={<CourseCreator />} />
           <Route path="/profile/:username" element={<ProfilePage />} />
           <Route path="/video-player" element={<VideoPlayer />} />
           <Route path="/video-player/:contentId" element={<VideoPlayer />} />
@@ -43,10 +44,12 @@ function App() {
           <Route path="/edit-profile/:username" element={<EditProfilePage />} />
           <Route path="/my-created-courses" element={<MyCourses />} />
           <Route path='/my-courses' element= {<AllCoursesPage/>} />
+          <Route path='/course' element= {< NewCourse/>} />
+          <Route path='/course/:id/:title' element={< CourseComponent/>} />
         </Routes>
       </BrowserRouter>  
-    </ThemeProvider>
     </AuthProvider>
+    </NotificationProvider>
     </>
   )
 }

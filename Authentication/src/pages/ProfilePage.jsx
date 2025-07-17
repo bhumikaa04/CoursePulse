@@ -1,77 +1,95 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiArrowLeft } from "react-icons/fi";
 import "../styles/ProfilePage.css";
 
 const ProfilePage = () => {
   const { profile: storedProfile } = useContext(AuthContext);
+  const { username } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [profileData, setProfileData] = useState(storedProfile || {});
+  const [profileData, setProfileData] = useState({});
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/profile/${storedProfile.username}`);
+        const response = await axios.get(`http://localhost:3001/profile/${username}`);
         setProfileData(response.data);
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching profile data:", err);
-        setError("Failed to load profile data.");
+        const status = err.response?.status || 500;
+        setError(status === 404 ? "Profile not found." : "An unexpected error occurred. Please try again.");
         setLoading(false);
       }
     };
 
-    if (storedProfile.username) {
+    if (username) {
       fetchProfile();
     } else {
       setError("Username is not available.");
       setLoading(false);
     }
-  }, [storedProfile.username]);
+  }, [username]);
 
   const handleEditProfile = () => {
-    navigate(`/edit-profile/${storedProfile.username}`);
+    navigate(`/edit-profile/${username}`);
   };
 
-  if (loading) return <div className="profile-loading">Loading profile...</div>;
-  if (error) return <div className="profile-error">{error}</div>;
+  if (loading) {
+    return (
+      <div className="profile-loading">
+        <p>Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-error">
+        <FiArrowLeft className="back-arrow" onClick={() => navigate(-1)} />
+        <p>{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-container">
+      {/* Back Arrow */}
+      <FiArrowLeft className="back-arrow" onClick={() => navigate(-1)} />
+
       {/* Profile Header */}
       <div className="profile-header">
         <div className="profile-photo-container">
-          <div className="profile-photo-wrapper">
-            <img
-              src={`http://localhost:3001${profileData.profilePhoto}` || "https://i.imgur.com/default-profile.jpg"}
-              alt={`${profileData.username || "User"}'s profile`}
-              className="profile-photo"
-              onError={(e) => {
-                e.target.src = "https://i.imgur.com/default-profile.jpg";
-              }}
-            />
-          </div>
+          <img
+            src={
+              profileData.profilePhoto
+                ? `http://localhost:3001${profileData.profilePhoto}`
+                : "https://i.imgur.com/default-profile.jpg"
+            }
+            alt={`${profileData.username || "User"}'s profile`}
+            className="profile-photo"
+            onError={(e) => {
+              e.target.src = "https://i.imgur.com/default-profile.jpg";
+            }}
+          />
         </div>
-        
+
         <div className="profile-info">
           <div className="profile-top-row">
-            <h1 className="profile-username">{profileData.username || "No Username"}</h1>
-            <button className="edit-profile-button" onClick={handleEditProfile}>
-              <FiEdit className="edit-icon" /> Edit Profile
-            </button>
+            <h1 className="profile-username">@{profileData.username || "No Username"}</h1>
+            {storedProfile.username === username && (
+              <button className="edit-profile-button" onClick={handleEditProfile}>
+                <FiEdit className="edit-icon" /> Edit Profile
+              </button>
+            )}
           </div>
-          
           <h2 className="profile-name">
-            {profileData.firstName || "No First Name"} {profileData.lastName || "No Last Name"}
+            {profileData.firstName || "First Name"} {profileData.lastName || "Last Name"}
           </h2>
-          
-          <p className="profile-bio">
-            {profileData.bio || "No bio available."}
-          </p>
+          <p className="profile-bio">{profileData.bio || "This user hasn't added a bio yet."}</p>
         </div>
       </div>
 
@@ -81,17 +99,23 @@ const ProfilePage = () => {
         <div className="courses-stats-container">
           <div className="course-stat-card">
             <h3 className="course-stat-title">Courses Created</h3>
-            <p className="course-stat-value">{profileData.courseCreated || 0}</p>
+            <p className={`course-stat-value ${profileData.courseCreated > 5 ? "high-stat" : "low-stat"}`}>
+              {profileData.courseCreated || 0}
+            </p>
           </div>
-          
+
           <div className="course-stat-card">
             <h3 className="course-stat-title">Courses Published</h3>
-            <p className="course-stat-value">{profileData.coursePublished || 0}</p>
+            <p className={`course-stat-value ${profileData.coursePublished > 5 ? "high-stat" : "low-stat"}`}>
+              {profileData.coursePublished || 0}
+            </p>
           </div>
-          
+
           <div className="course-stat-card">
             <h3 className="course-stat-title">Courses Enrolled</h3>
-            <p className="course-stat-value">{profileData.courseEnrolled || 0}</p>
+            <p className={`course-stat-value ${profileData.courseEnrolled > 5 ? "high-stat" : "low-stat"}`}>
+              {profileData.courseEnrolled || 0}
+            </p>
           </div>
         </div>
       </div>

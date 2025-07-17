@@ -10,36 +10,28 @@ const SearchComponent = () => {
   const [error, setError] = useState(null);
   const searchInputRef = useRef(null);
 
-  // Debounce the search query to reduce API calls
+  // Debounce the search query
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery.trim());
-    }, 500);
-
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery.trim()), 500);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Fetch search results when the debounced query changes
+  // Fetch results
   useEffect(() => {
     const fetchResults = async () => {
       if (!debouncedQuery) {
         setSearchResults({ courses: [], profiles: [] });
         return;
       }
-
       setIsLoading(true);
       setError(null);
 
       try {
         const response = await fetch(`http://localhost:3001/search?q=${encodeURIComponent(debouncedQuery)}`);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         const data = await response.json();
         setSearchResults(data);
       } catch (err) {
-        console.error("Search fetch error:", err.message);
         setError(err.message || "An error occurred. Please try again.");
       } finally {
         setIsLoading(false);
@@ -52,7 +44,6 @@ const SearchComponent = () => {
   const handleClearSearch = () => {
     setSearchQuery("");
     setSearchResults({ courses: [], profiles: [] });
-    setError(null);
     searchInputRef.current.focus();
   };
 
@@ -73,19 +64,10 @@ const SearchComponent = () => {
       </div>
 
       <div className="search-status">
-        {isLoading && <p className="loading-indicator">Loading results...</p>}
-        {error && (
-          <div className="error-message">
-            <p>{error}</p>
-            <button className="retry-button" onClick={() => setDebouncedQuery(searchQuery)}>
-              Retry
-            </button>
-          </div>
-        )}
+        {isLoading && <p className="loading-indicator">Loading...</p>}
+        {error && <p className="error-message">{error}</p>}
         {!isLoading && !error && debouncedQuery && (
-          <p className="results-count">
-            Found {searchResults.courses.length + searchResults.profiles.length} results
-          </p>
+          <p className="results-count">Found {searchResults.courses.length + searchResults.profiles.length} results</p>
         )}
       </div>
 
@@ -98,23 +80,9 @@ const SearchComponent = () => {
             />
           </Section>
         )}
-        {searchResults.courses.length > 0 && (
-          <Section title="Courses">
-            <CardsList
-              items={searchResults.courses}
-              renderItem={(course) => <CourseCard key={course.id || course._id} course={course} />}
-            />
-          </Section>
+        {!isLoading && !error && debouncedQuery && searchResults.profiles.length === 0 && (
+          <p className="no-results">No results found for "{debouncedQuery}"</p>
         )}
-        {!isLoading &&
-          !error &&
-          debouncedQuery &&
-          searchResults.courses.length === 0 &&
-          searchResults.profiles.length === 0 && (
-            <div className="no-results">
-              No results found for "{debouncedQuery}"
-            </div>
-          )}
       </div>
     </div>
   );
@@ -146,28 +114,25 @@ const Section = ({ title, children }) => (
 );
 
 const CardsList = ({ items, renderItem }) => (
-  <div className="cards-container">
-    {items.map(renderItem)}
-  </div>
+  <div className="cards-container">{items.map(renderItem)}</div>
 );
 
 const ProfileCard = ({ profile }) => (
   <div className="card profile-card">
     <div className="card-content">
-      {/* Image and Name Section */}
       <div className="profile-header">
         <img
-          src={profile.profilePhoto || "default-profile.png"} // Fallback to a default image
-          alt={`${profile.name}'s profile`}
+          src={`http://localhost:3001${profile.profilePhoto}` || "default-profile.png"}
+          alt={`${profile.firstName} ${profile.lastName}'s profile`}
           className="profile-image"
         />
-        <div className="profile-info">
-          <h4>{profile.name || "Unknown Name"}</h4>
-          <p>@{profile.ownerEmail || "Unknown Email"}</p>
-        </div>
       </div>
-
-      {/* Button Section */}
+      <div className="profile-details">
+        <p className="username">@{profile.username || "unknown"}</p>
+        <h4 className="name">
+          {profile.firstName} {profile.lastName || ""}
+        </h4>
+      </div>
       <div className="profile-button">
         <Link to={`/profile/${profile.username || profile._id}`} className="button-link">
           Go to Profile
@@ -177,14 +142,5 @@ const ProfileCard = ({ profile }) => (
   </div>
 );
 
-const CourseCard = ({ course }) => (
-  <div className="card course-card">
-    <div className="card-content">
-      <h4>{course.title || "Untitled Course"}</h4>
-      <p>{course.description || "No description available."}</p>
-      <span>By {course.instructor || "Unknown Instructor"}</span>
-    </div>
-  </div>
-);
 
 export default SearchComponent;

@@ -135,24 +135,6 @@ body {
   font-size: 1.2rem;
 }
 
-/* Shared styles for all sidebar items */
-.sidebar-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: var(--medium-text);
-    background: none;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    width: 100%;
-}
-
-.sidebar-item span {
-    margin-left: 10px;
-}
-
 .sidebar-nav li.active button {
   background-color: rgba(67, 97, 238, 0.1);
   color: var(--primary-color);
@@ -168,7 +150,6 @@ body {
 .sidebar-list-item {
     list-style: none;
 }
-
 
 .user-info {
   display: flex;
@@ -208,7 +189,17 @@ body {
   position: relative;
 }
 
-.sidebar-nav a {
+/* Update or add these styles in your Dashboard.css */
+
+/* Ensure all list items have consistent styling */
+.sidebar-nav li {
+  margin-bottom: 0.5rem;
+  position: relative;
+  cursor: pointer;
+}
+
+/* Style for all links including logout */
+.sidebar-nav li a {
   display: flex;
   align-items: center;
   padding: 0.75rem 1.5rem;
@@ -218,15 +209,24 @@ body {
   border-left: 3px solid transparent;
 }
 
+/* Hover state for all links */
+.sidebar-nav li a:hover {
+  background-color: rgba(67, 97, 238, 0.05);
+  color: var(--primary-color);
+}
+
+/* Active state for all links */
 .sidebar-nav li.active a {
   background-color: rgba(67, 97, 238, 0.1);
   color: var(--primary-color);
   border-left-color: var(--primary-color);
 }
 
-.sidebar-nav a:hover {
-  background-color: rgba(67, 97, 238, 0.05);
-  color: var(--primary-color);
+/* Icon styling for all links */
+.sidebar-nav a svg {
+  margin-right: 12px;
+  font-size: 1.2rem;
+  min-width: 24px; /* Ensure icons maintain consistent spacing */
 }
 
 .sidebar-nav a svg {
@@ -686,17 +686,11 @@ body {
   background: #aaa;
 }
 
-.sidebar-nav-button {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1.5rem;
-  color: var(--medium-text);
-  text-decoration: none; /* buttons don’t usually have this but no harm */
-  transition: all 0.2s;
-  border-left: 3px solid transparent;
-  background: none;
-  border: none;
-  width: 100%;
-  cursor: pointer;
-  font: inherit; /* keep font consistent */
+.dashboard-sidebar{
+  overflow: scroll;
+  scrollbar-width: none;
 }
+
+.dashboard-sidebar::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for WebKit browsers */
+} 

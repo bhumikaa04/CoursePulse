@@ -1,15 +1,15 @@
-import { useState , useContext } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/FormCSS.css";
-import { AuthContext } from "../context/AuthContext";
+import { useNotification } from "../context/NotificationContext";
 
 function Login() {
-    const { setIsLoggedIn } = useContext(AuthContext); // Accessing the AuthContext to manage login state
     const [formData, setFormData] = useState({ email: "", password: "" });
-    const [error, setError] = useState(""); // For displaying error messages
+    const [error, setError] = useState(""); // For form validation errors
     const [isLoading, setIsLoading] = useState(false); // For loading state
     const navigate = useNavigate();
+    const showNotification = useNotification(); // Accessing the notification system
 
     // Handling input changes
     const handleChange = (e) => {
@@ -17,7 +17,7 @@ function Login() {
             ...formData,
             [e.target.name]: e.target.value,
         });
-        setError(""); // Clear error messages when the user types
+        setError(""); // Clear form errors when user types
     };
 
     // Email validation function
@@ -29,50 +29,44 @@ function Login() {
     // Form submit handler
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         if (!validateEmail(formData.email)) {
             setError("Please enter a valid email address");
             return;
         }
-    
+
         if (formData.password.length < 6) {
             setError("Password must be at least 6 characters long");
             return;
         }
-    
+
         setIsLoading(true);
         setError("");
-    
+
         try {
             const response = await axios.post("http://localhost:3001/login", formData, {
                 headers: { "Content-Type": "application/json" },
             });
 
-            console.log("Response Data:", response.data); // Log the response data
-            const data = response.data;
-    
             if (response.data.token) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("user", JSON.stringify(data.user));
-                localStorage.setItem("profile", JSON.stringify(response.data.profile));
-                setIsLoggedIn(true);
-                alert("Login successful!");
+                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("user", JSON.stringify(response.data.user));
+                showNotification("Login successful!", "success");
                 navigate("/dashboard");
             } else {
-                setError("Login failed: No token received");
+                showNotification("Login failed: No token received", "error");
             }
         } catch (error) {
-            console.error("Error Response:", error.response);
-            // setError(
-            //     error.response?.status === 401
-            //         ? "Invalid email or password. Please try again."
-            //         : error.response?.data?.message || "An unexpected error occurred."
-            // );
+            showNotification(
+                error.response?.status === 401
+                    ? "Invalid email or password. Please try again."
+                    : "An unexpected error occurred.",
+                "error"
+            );
         } finally {
             setIsLoading(false);
         }
     };
-    
 
     return (
         <div className="container mt-4 flex row justify-content-center">

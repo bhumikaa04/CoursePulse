@@ -10,13 +10,13 @@ export const AuthProvider = ({ children }) => {
   const [userDetails, setUserDetails] = useState(null);
   const [storedUser, setStoredUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [user , setUser] = useState(null); 
 
   // Update profile and sync with localStorage
   const updateProfile = (newProfileData) => {
     console.log("Updating profile with:", newProfileData); // Debugging log
     setProfile((prev) => {
       const updatedProfile = { ...prev, ...newProfileData };
-
       // Save the updated profile to localStorage
       localStorage.setItem("profile", JSON.stringify(updatedProfile));
 
@@ -28,12 +28,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userFromStorage = localStorage.getItem("user");
-    const profileFromStorage = localStorage.getItem("profile");
-
-    // Log data for debugging (optional, remove for production)
-    // console.log("profileFromStorage:", profileFromStorage);
-    // console.log("userFromStorage:", userFromStorage);
-    // console.log("token:", token);
+    const profileFromStorage = localStorage.getItem("profile"); 
 
     if (token && userFromStorage) {
       setIsLoggedIn(true);

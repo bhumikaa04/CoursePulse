@@ -220,3 +220,24 @@
     height: 120px;
   }
 }
+.back-arrow {
+  position: fixed; /* Changed from absolute to fixed to stay visible when scrolling */
+  top: 20px;
+  left: 20px;
+  font-size: 50px;
+  color: #4361ee;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.9); /* Added subtle background for better visibility */
+  padding: 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  transition: transform 0.2s, color 0.2s, background 0.2s;
+  z-index: 1000; /* Ensure it stays above other content */
+  margin: 0; /* Removed margin since we're using absolute positioning */
+}
+
+.back-arrow:hover {
+  color: #3f37c9;
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 1); /* Solid background on hover */
+}

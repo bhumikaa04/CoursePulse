@@ -1,0 +1,80 @@
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    color: #fff;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.5s ease-out, fadeOut 3s 2.5s forwards;
+}
+
+.notification.success {
+    background-color: #28a745; /* Green for success */
+}
+
+.notification.error {
+    background-color: #f5394c; /* Red for error */
+}
+
+.notification.logout{
+    background-color: #6C757D; /* Gray for logout */
+}
+
+.progress-bar {
+    height: 5px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.2); /* Light background for progress bar */
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.progress-bar::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.7); /* White progress */
+    animation: progress 3s linear forwards; /* Sync with notification duration */
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateX(-50%) translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes progress {
+    0% {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+    100% {
+        transform: scaleX(0);
+        transform-origin: left;
+    }
+}

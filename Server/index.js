@@ -13,6 +13,9 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const bodyParser = require("body-parser");
+const { isShallowEqualArray } = require('framer/render/utils/isShallowEqualArray.js');
+const noteController = require('./controllers/noteController')
+const markupRoute = require('./Routes/markup.js');
 
 const app = express();
 app.use(express.json());
@@ -20,10 +23,18 @@ app.use(cors());
 
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads/images', express.static(path.join(__dirname, '../uploads/images')));
+app.use('/uploads/documents', express.static(path.join(__dirname, '../uploads/documents')));
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
+app.use('/pdf-workers', express.static(path.join(__dirname, 'public', 'pdf-workers')));
 
-app.use('/uploads/images', express.static(path.join(__dirname, 'uploads/images')));
+app.use('/uploads/documents', express.static(path.join(__dirname, '../uploads/documents')));
+app.use('/uploads/thumbnails', express.static(path.join(__dirname, '../uploads/thumbnails')));
+app.use('/uploads/images', express.static(path.join(__dirname, '../uploads/images')));
+app.use('/uploads/videos', express.static(path.join(__dirname, '../uploads/videos')));
+app.use('/uploads/audio', express.static(path.join(__dirname, '../uploads/audio')));
+
 
 // Connect to MongoDB
 mongoose.connect('mongodb+srv://itsbhumika04:itsbhumika04@cluster0.9iaylg7.mongodb.net/')
@@ -91,7 +102,6 @@ const createUserProfile = async (username) => {
 };
 
 // Registration Route
-
 router.post('/register', async (req, res) => {
     const { email, username, password, firstName, lastName, age, bio } = req.body;
 
@@ -337,222 +347,6 @@ app.put("/edit-profile/:username", uploadProfilePhoto.single('profilePhoto'), as
   }
 });
 
-app.post('/create-course', async (req, res) => {
-  try {
-    const course = new Course(req.body);
-    await course.save();
-    res.status(201).send(course);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-// app.post('/create-course/save', authenticationToken, async (req, res) => {
-//   try {
-//     // Log the entire request body first
-//     console.log('Full request body:', req.body);
-//     const { course } = req.body;
-
-//     // Detailed logging of the course data
-//     console.log('Received course data:', {
-//       title: course?.title,
-//       hasContents: !!course?.contents,
-//       contentsLength: course?.contents?.length || 0,
-//       isUpdate: !!course?._id,
-//       ownerEmail: req.user.email // From auth token
-//     });
-
-//     // Validate course data exists
-//     if (!course) {
-//       console.error('No course data received');
-//       return res.status(400).json({ error: 'Missing course data' });
-//     }
-
-//     // Validate required fields
-//     if (!course.title) {
-//       console.error('Missing title in course data:', course);
-//       return res.status(400).json({ error: 'Missing required title field' });
-//     }
-
-//     // Log contents if they exist
-//     if (course.contents && course.contents.length > 0) {
-//       console.log('Contents received:');
-//       course.contents.forEach((content, index) => {
-//         console.log(`Content ${index + 1}:`, {
-//           title: content.title,
-//           type: content.type,
-//           url: content.url,
-//           description: content.description?.length || 'No description',
-//           thumbnail: content.thumbnail ? 'Has thumbnail' : 'No thumbnail'
-//         });
-//       });
-//     } else {
-//       console.log('No contents received or empty contents array');
-//     }
-
-//     let savedCourse;
-//     let isNewCourse = false;
-
-//     if (course._id) {
-//       console.log('Processing course update for ID:', course._id);
-      
-//       const existingCourse = await Course.findOne({ _id: course._id, ownerEmail: req.user.email });
-//       if (!existingCourse) {
-//         console.error('Course not found or unauthorized:', {
-//           requestedId: course._id,
-//           ownerEmail: req.user.email
-//         });
-//         return res.status(404).json({ error: 'Course not found or unauthorized' });
-//       }
-
-//       savedCourse = await Course.findOneAndUpdate(
-//         { _id: course._id, ownerEmail: req.user.email },
-//         {
-//           $set: {
-//             title: course.title,
-//             contents: course.contents || [],
-//             updatedAt: new Date(),
-//           },
-//         },
-//         { new: true }
-//       );
-//       console.log('Course updated:', savedCourse);
-//     } else {
-//       console.log('Creating new course');
-//       const newCourse = new Course({
-//         title: course.title,
-//         ownerEmail: req.user.email,
-//         contents: course.contents || [],
-//         published: false,
-//       });
-//       savedCourse = await newCourse.save();
-//       isNewCourse = true;
-//       console.log('New course created:', savedCourse);
-
-//       // Increment courseCreated count for the user
-//       await User.updateOne(
-//         { email: req.user.email },
-//         { $inc: { courseCreated: 1 } }
-//       );
-//       console.log('User course count incremented');
-//     }
-
-//     res.status(201).json(savedCourse);
-//   } catch (err) {
-//     console.error('Save error:', {
-//       error: err.message,
-//       stack: err.stack,
-//       requestBody: req.body
-//     });
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
-app.post('/create-course/save', authenticationToken, async (req, res) => {
-  try {
-    // Log the entire request body
-    console.log('Full request body:', req.body);
-    const { course } = req.body;
-
-    // Detailed logging of the course data
-    console.log('Received course data:', {
-      title: course?.title,
-      hasContents: !!course?.contents,
-      contentsLength: course?.contents?.length || 0,
-      isUpdate: !!course?._id,
-      ownerEmail: req.user.email // From auth token
-    });
-
-    // Validate course data exists
-    if (!course) {
-      console.error('No course data received');
-      return res.status(400).json({ error: 'Missing course data' });
-    }
-
-    // Validate required fields
-    if (!course.title) {
-      console.error('Missing title in course data:', course);
-      return res.status(400).json({ error: 'Missing required title field' });
-    }
-
-    // Log contents if they exist
-    if (course.contents && course.contents.length > 0) {
-      console.log('Contents received:');
-      course.contents.forEach((content, index) => {
-        console.log(`Content ${index + 1}:`, {
-          title: content.title,
-          type: content.type,
-          url: content.url,
-          description: content.description?.length || 'No description',
-          thumbnail: content.thumbnail ? 'Has thumbnail' : 'No thumbnail'
-        });
-      });
-    } else {
-      console.log('No contents received or empty contents array');
-    }
-
-    let savedCourse;
-    let isNewCourse = false;
-
-    if (course._id) {
-      console.log('Processing course update for ID:', course._id);
-
-      const existingCourse = await Course.findOne({ _id: course._id, ownerEmail: req.user.email });
-      if (!existingCourse) {
-        console.error('Course not found or unauthorized:', {
-          requestedId: course._id,
-          ownerEmail: req.user.email
-        });
-        return res.status(404).json({ error: 'Course not found or unauthorized' });
-      }
-
-      savedCourse = await Course.findOneAndUpdate(
-        { _id: course._id, ownerEmail: req.user.email },
-        {
-          $set: {
-            title: course.title,
-            contents: course.contents || [],
-            updatedAt: new Date(),
-          },
-        },
-        { new: true }
-      );
-      console.log('Course updated:', savedCourse);
-    } else {
-      console.log('Creating new course');
-      const newCourse = new Course({
-        title: course.title,
-        ownerEmail: req.user.email,
-        contents: course.contents || [],
-        published: false,
-      });
-      savedCourse = await newCourse.save();
-      isNewCourse = true;
-      console.log('New course created:', savedCourse);
-
-    const updatedUser = await profileModel.findOne({ email: req.user.email });
-    console.log('Updated user profile:', updatedUser);
-    res.status(201).json({ course: savedCourse, user: updatedUser });
-
-    // Increment courseCreated count for the user
-      console.log('Incrementing courseCreated for user:', req.user.email);
-      const userUpdateResult = await profileModel.updateOne(
-        { username: req.user.username },
-        { $inc: { courseCreated: 1 } }
-      );
-      console.log('User update result:', userUpdateResult);
-    }
-  } catch (err) {
-    console.error('Save error:', {
-      error: err.message,
-      stack: err.stack,
-      requestBody: req.body
-    });
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-
 app.get('/courses', authenticateToken, async (req, res) => {
   try {
     console.log('Fetching courses for user:', req.user.email);
@@ -645,41 +439,6 @@ app.get("/recommended-courses", (req, res) => {
   res.json({ courses });
 });
 
-// app.get('/search', async (req, res) => {
-//   const { q } = req.query;
-
-//   if (!q) {
-//     return res.json({ courses: [], profiles: [] });
-//   }
-
-//   try {
-//     const courses = await Course.find({ title: { $regex: q, $options: 'i' } });
-//     const profiles = await User.find({ username: { $regex: q, $options: 'i' } });
-
-//     res.json({ courses, profiles });
-//   } catch (err) {
-//     res.status(500).send({ message: 'Error fetching search results.' });
-//   }
-// });
-
-// app.get('/search', async (req, res) => {
-//   const { q } = req.query;
-
-//   if (!q) {
-//     return res.json({ courses: [], profiles: [] });
-//   }
-
-//   try {
-//     const courses = await Course.find({ title: { $regex: q, $options: 'i' } });
-//     const profiles = await User.find({ username: { $regex: q, $options: 'i' } });
-
-//     return res.json({ courses, profiles });
-//   } catch (err) {
-//     console.error('Error fetching search results:', err.message); // Log error to the server console
-//     res.status(500).json({ message: 'Error fetching search results.' });
-//   }
-// });
-
 router.get('/search', async (req, res) => {
   try {
 
@@ -702,8 +461,8 @@ router.get('/search', async (req, res) => {
       title: { $regex: q, $options: 'i' }
     }).limit(10);
 
-    console.log('profiles : ' , profiles) ;
-    console.log('courses : ' , courses); 
+    console.log('profiles in backend: ' , profiles) ;
+    console.log('courses in backend : ' , courses); 
 
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json({ profiles, courses });
@@ -712,39 +471,6 @@ router.get('/search', async (req, res) => {
     res.status(500).json({
       message: 'An error occurred during search',
       error: error.message
-    });
-  }
-});
-
-
-router.get("/my-created-courses", authenticateToken, async (req, res) => {
-  try {
-    // Get the authenticated user's email from the token
-    const userEmail = req.user.email; 
-    
-    // Find only courses where ownerEmail matches the logged-in user's email
-    const userCourses = await Course.find({ ownerEmail: userEmail })
-      .select('-__v') // Exclude version key
-      .sort({ createdAt: -1 }); // Sort by newest first
-
-    if (!userCourses || userCourses.length === 0) {
-      return res.status(200).json({ 
-        message: "You haven't created any courses yet",
-        courses: [] 
-      });
-    }
-
-    res.status(200).json({ 
-      success: true,
-      count: userCourses.length,
-      courses: userCourses 
-    });
-
-  } catch (error) {
-    console.error("Error fetching user courses:", error);
-    res.status(500).json({ 
-      success: false,
-      error: "Failed to fetch your courses" 
     });
   }
 });
@@ -775,9 +501,455 @@ router.get("/my-courses", authenticateToken , async (req, res) => {
   }
 });
 
-// Use the router in the Express app
+//Route to fetch the course page
+router.get("/course" , authenticateToken , async(req, res) => {
+  try{
+    //extracting the email
+    const userEmail = req.user.email ;  
+    const username = req.user.username;
+    //extract the profile Model for the user
+    const userProfile = await profileModel.findOne({ username: req.user.username}); 
+
+    //fetch the created courses by the user 
+    const createdCourses = await Course.find({ownerEmail : userEmail}); 
+    console.log(createdCourses); 
+    //console.log("courses : " , createdCourses); 
+
+    //fetch the courses enrolled by the user 
+    const enrolledCourses = await Course.find({"contents.ownerEmail" : userEmail }); 
+
+    //sending the response
+    res.status(200).json({
+      user: userProfile,
+      createdCourses, 
+      enrolledCourses, 
+    }); 
+  }catch (err){
+    console.log("error fetching the courses!"); 
+    console.error("error : " , err); 
+    res.status(500).json({message : "Courses not found!"}); 
+  }
+}); 
+
+//Route to create a new Course
+router.post('/course/addCourse' , authenticateToken , async(req, res) => {
+  const { title, ownerEmail , username } = req.body;
+  try{
+    if (!title || !ownerEmail) {
+      return res.status(400).json({ message: 'Title and owner email are required.' });
+    }
+
+    // Create a new Course instance
+    const newCourse = new Course({
+      title,
+      ownerEmail,
+      createdAt : new Date(), 
+      updatedAt : new Date(),
+    });
+
+    // Save the new course to the database
+    await newCourse.save();
+
+    const profile = await profileModel.findOneAndUpdate(
+      { username: username },
+      { $push: { coursesCreated: newCourse._id } }, 
+    )
+
+    // Send a success response with the created course data
+    res.status(201).json({
+      message: 'Course created successfully!',
+      course: newCourse, 
+    });
+
+  } catch (error) {
+    console.error('Error creating course:', error);
+    // Handle Mongoose validation errors specifically
+    if (error.name === 'ValidationError') {
+      const errors = Object.keys(error.errors).map(key => error.errors[key].message);
+      return res.status(400).json({ message: 'Validation failed', errors });
+    }
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+})
+
+//Route to get the courseInfo
+router.get('/course/:id/:title?' , authenticateToken , async(req, res) => {
+  const courseId = req.params.id ; 
+  const courseTitle = req.params.title ; 
+  //console.log("Hitting GET /course/:id/:title for courseId:", courseId , courseTitle);
+
+  try{
+    const course = await Course.findOne({ _id : courseId , ownerEmail : req.user.email }); 
+
+    if(!course){
+      console.log("Course not found or unauthorized for GET request:", courseId);
+      return res.status(404).json({ error: "Course not found or unauthorized." });
+    }
+    console.log("Successfully fetched course:", courseId);
+    res.status(200).json(course); 
+  }catch(err){
+    console.error('Error fetching course:', err);
+    return res.status(500).json({err : "server error while fetching the course"})
+  }
+})
+
+//Route to publish the courses 
+router.post('/course/:id/publish' , authenticateToken , async(req , res) => {
+  const courseId = req.params.id ; 
+
+  try{
+    //find the course
+    const course = await Course.findOne({ _id : courseId , ownerEmail : req.user.email}); 
+
+    //condition if not found 
+    if(!course){
+      return res.status(200).json({error : "Course not found or authorized"}); 
+    }
+    //update the values 
+    const updatedCourse = await Course.findOneAndUpdate(
+      {_id : courseId} , 
+      {
+        published : !course.published, 
+        updatedAt : new Date()
+      } , 
+      {new : true}, 
+    );
+    //send the new response 
+    return res.status(200).json({
+      course : updatedCourse , 
+      message : updatedCourse.published 
+        ? "Course published successfully" 
+        : "Course unpublished successfully"
+  }); 
+  }catch(err){
+    console.error('Error publishing course:', err);
+    res.status(500).json({ error: "Server error while publishing course" });
+  }
+}); 
+
+//Route to delete the course 
+router.delete('/course/:id/delete' , authenticateToken , async(req , res) => {
+  //courseID 
+  const courseId = req.params.id ; 
+  //find and delete 
+  try{
+    const result = await Course.findOneAndDelete({
+      _id : courseId , 
+      ownerEmail : req.user.email 
+    })
+
+    const profile = await profileModel.findOneAndUpdate(
+      {_id : courseId } , 
+      { $inc :{ courseCreated : -1}},
+      {new : true} 
+    )
+
+    if(!result){
+      console.log("Course not found or unauthorized for deletion:", courseId);
+      return res.status(404).json({ error: "Course not found or unauthorized for deletion." });
+    }
+
+    //send success message
+    console.log("Course successfully deleted:", courseId);
+
+    res.status(200).json({ 
+      message: "Course deleted successfully!", 
+      deletedCourseId: courseId
+    });
+  }catch(err){
+    console.error('Error deleting course:', err);
+    res.status(500).json({ error: "Server error while deleting course." });
+  }
+  
+}); 
+
+//Route to save the courses
+router.post('/course/:id/save' , authenticateToken , async(req, res) => {
+  const courseId = req.params.id ;
+  const {course} = req.body ;
+
+  if(!course){
+    console.log("Error: No course data in request body.");
+    return res.status(404).json({error : "Error fetching the course."}) // This error message is a bit misleading if 'course' is just missing from the body. "Missing course data in request body" might be clearer.
+  }
+
+  try{
+      console.log("Attempting to find course with _id:", courseId, "and ownerEmail:", req.user.email);
+      const existingCourse = await Course.findOne({ _id : courseId , ownerEmail : req.user.email});
+      if(!existingCourse){
+        console.log("Course not found or unauthorized for courseId:", courseId, "and ownerEmail:", req.user.email);
+        return res.status(404).json({error : "Course not found or unauthorized"});
+      }
+
+      //update the course fields
+      existingCourse.title  = course.title || existingCourse.title ;
+      existingCourse.description= course.description || existingCourse.description ;
+      existingCourse.updatedAt = new Date();
+
+      const updatedCourse = await existingCourse.save();
+      console.log("Course successfully saved. Updated course:", updatedCourse);
+      res.status(200).json({course : updatedCourse});
+  }catch(err){
+    console.error('Error saving course:', err);
+    res.status(500).json({ error: "Server error while saving course." });
+  }
+})
+
+// Create a single storage configuration that handles both content and thumbnails
+const combinedStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    let uploadDir;
+    
+    if (file.fieldname === 'thumbnail') {
+      uploadDir = path.join(__dirname, '../uploads/thumbnails');
+    } else {
+      const type = req.body?.type || 'document';
+      uploadDir = path.join(__dirname, `../uploads/${type}s`);
+    }
+    
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+// File filter configuration (same as before)
+const fileFilter = (req, file, cb) => {
+  const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+  const validDocumentTypes = ['application/pdf', 'application/msword', 
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  const validVideoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+  const validAudioTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg'];
+
+  if (file.fieldname === 'thumbnail') {
+    if (!validImageTypes.includes(file.mimetype)) {
+      return cb(new Error('Only images (JPEG, PNG, GIF) are allowed for thumbnails'));
+    }
+    return cb(null, true);
+  }
+
+  if (file.fieldname === 'file') {
+    const contentType = req.body?.type || 'document';
+    
+    switch(contentType) {
+      case 'image':
+        if (!validImageTypes.includes(file.mimetype)) {
+          return cb(new Error('Only images are allowed for image content'));
+        }
+        break;
+      case 'document':
+        if (!validDocumentTypes.includes(file.mimetype)) {
+          return cb(new Error('Only PDF or Word documents are allowed'));
+        }
+        break;
+      case 'video':
+        if (!validVideoTypes.includes(file.mimetype)) {
+          return cb(new Error('Only MP4, WebM or Ogg videos are allowed'));
+        }
+        break;
+      case 'audio':
+        if (!validAudioTypes.includes(file.mimetype)) {
+          return cb(new Error('Only MP3, WAV or Ogg audio files are allowed'));
+        }
+        break;
+      default:
+        return cb(new Error('Invalid content type specified'));
+    }
+    return cb(null, true);
+  }
+
+  cb(new Error('Unexpected file field'));
+};
+
+// Fixed route handler
+router.post('/course/:id/addContent',
+  authenticateToken,
+  (req, res, next) => {
+    const upload = multer({
+      storage: combinedStorage, // Use the single combined storage
+      fileFilter: fileFilter,
+      limits: { fileSize: 100 * 1024 * 1024 } // 100MB max
+    }).fields([
+      { name: 'file', maxCount: 1 },
+      { name: 'thumbnail', maxCount: 1 }
+    ]);
+    
+    upload(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      next();
+    });
+  },
+  async (req, res) => {
+    try {
+      const { title, type, description, url, inputMethod } = req.body;
+      const courseId = req.params.id;
+
+      // Validate course ownership
+      const course = await Course.findOne({ _id: courseId, ownerEmail: req.user.email });
+      if (!course) {
+        return res.status(404).json({ error: 'Course not found or unauthorized' });
+      }
+
+      let contentPath;
+      let thumbnailPath;
+
+      // Handle content path
+      if (inputMethod === 'file') {
+        if (!req.files?.file?.[0]) {
+          return res.status(400).json({ error: 'No file uploaded' });
+        }
+        contentPath = `/uploads/${type}s/${req.files.file[0].filename}`;
+      } else {
+        if (!url || !isValidUrl(url)) {
+          return res.status(400).json({ error: 'Valid URL required' });
+        }
+        contentPath = url;
+      }
+
+      // Handle thumbnail
+      if (req.files?.thumbnail?.[0]) {
+        thumbnailPath = `/uploads/thumbnails/${req.files.thumbnail[0].filename}`;
+      } else if (type === 'video' && inputMethod === 'url' && url.includes('youtube.com')) {
+        // Auto-generate YouTube thumbnail
+        const videoId = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1];
+        thumbnailPath = `http://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+      }
+
+      // Create content object
+      const newContent = {
+        title,
+        type,
+        description,
+        url: contentPath,
+        thumbnail: thumbnailPath,
+        createdAt: new Date(),
+        order: course.contents.length
+      };
+
+      // Save to database
+      course.contents.push(newContent);
+      course.updatedAt = new Date();
+      await course.save();
+
+      res.status(201).json({
+        message: 'Content added successfully!',
+        content: newContent
+      });
+
+    } catch (err) {
+      console.error('Error adding content:', err);
+      
+      // Cleanup uploaded files if error occurred
+      if (req.files) {
+        Object.values(req.files).forEach(files => {
+          files.forEach(file => {
+            fs.unlink(file.path, () => {});
+          });
+        });
+      }
+      
+      res.status(500).json({ 
+        error: err.message || 'Failed to add content'
+      });
+    }
+  }
+);
+
+//Route to delete content in the particular course 
+router.delete('/course/:id/:contentIndex' , authenticateToken , async(req, res) => {
+  try{
+    const courseId = req.params.id; 
+    const contentIndex = parseInt(req.params.contentIndex); 
+    //finding the course 
+    const course = await Course.findOne({ _id: courseId, ownerEmail: req.user.email });
+    //check authorization 
+    if(!course){
+      return res.status(404).json({error : "Course not found or unathorized."}); 
+    }
+    //check validity of contentIndex
+    if(contentIndex < 0 || contentIndex >= course.contents.length){
+      return res.status(400).json({error : "Invalid value of Content Index"}); 
+    }
+
+    //removing the content 
+    course.contents.splice(contentIndex , 1); 
+    course.updatedAt = new Date(); 
+    await course.save(); 
+
+    return res.status(200).json({message : "Content Deleted Successfully!!"}); 
+  }catch(err){
+    console.error("Error deleting content:", err);
+    res.status(500).json({ error: "Server error while deleting content" });
+  }
+}); 
+
+//Route to edit content in a particular course 
+// router.put(
+//   '/course/:courseId/:contentId',
+//   authenticateToken,
+//   uploadFormData.fields([
+//     { name: 'thumbnail', maxCount: 1 },
+//     { name: 'document', maxCount: 1 }, // Only relevant for type=document
+//   ]),
+//   async (req, res) => {
+//     try {
+//       const { courseId, contentId } = req.params;
+//       const { title, description, type, url, currentDocumentPath, currentThumbnailPath } = req.body;
+
+//       const thumbnailFile = req.files['thumbnail']?.[0];
+//       const documentFile = req.files['document']?.[0];
+
+//       const course = await Course.findOne({ _id: courseId, ownerEmail: req.user.email });
+//       if (!course) return res.status(404).json({ message: 'Course not found or unauthorized' });
+
+//       const contentItem = course.contents.find(item => item._id.toString() === contentId);
+//       if (!contentItem) return res.status(404).json({ message: 'Content item not found' });
+
+//       // Update common fields
+//       contentItem.title = title;
+//       contentItem.description = description;
+//       contentItem.type = type;
+//       contentItem.updatedAt = new Date(); 
+
+//       // Update thumbnail
+//       if (thumbnailFile) {
+//         contentItem.thumbnail = `/uploads/images/${thumbnailFile.filename}`;
+//       } else if (currentThumbnailPath) {
+//         contentItem.thumbnail = currentThumbnailPath;
+//       }
+
+//       // Update content url depending on type
+//       if (type === 'document') {
+//         if (documentFile) {
+//           contentItem.url = `/uploads/documents/${documentFile.filename}`;
+//         } else if (currentDocumentPath) {
+//           contentItem.url = currentDocumentPath;
+//         }
+//       } else {
+//         // For video, audio, link, article
+//         contentItem.url = url || '';
+//       }
+
+//       await course.save();
+//       res.status(200).json(contentItem);
+//     } catch (err) {
+//       console.error('Error updating content:', err);
+//       res.status(500).json({ message: 'Internal server error' });
+//     }
+//   }
+// );
+
+
+
 app.use('/', router);
-app.use('/create-course', router); 
+app.use('/api/markups', markupRoute);
 
 // Start the server
 app.listen(3001, () => {

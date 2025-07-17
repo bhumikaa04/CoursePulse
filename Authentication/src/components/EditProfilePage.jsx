@@ -1,9 +1,9 @@
-import React, { useState, useContext, useRef } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/EditProfilePage.css";
 import { AuthContext } from "../context/AuthContext";
 
-const BASE_URL = "http://localhost:3001"; // Set your backend URL
+const BASE_URL = "http://localhost:3001";
 
 const EditProfilePage = () => {
   const { profile, updateProfile } = useContext(AuthContext);
@@ -11,43 +11,53 @@ const EditProfilePage = () => {
   const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
-    firstName: profile.firstName || "",
-    lastName: profile.lastName || "",
-    bio: profile.bio || "",
+    firstName: "",
+    lastName: "",
+    bio: "",
   });
-
-  const [previewImage, setPreviewImage] = useState(
-    `${BASE_URL}/uploads/images/${profile.profilePhoto}` || ""
-  );
+  const [previewImage, setPreviewImage] = useState("/default-profile.png");
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Handle file selection
+  // Initialize form data when profile is available
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        firstName: profile.firstName || "",
+        lastName: profile.lastName || "",
+        bio: profile.bio || "",
+      });
+      setPreviewImage(
+        profile.profilePhoto 
+          ? `${BASE_URL}${profile.profilePhoto}`
+          : "/default-profile.png"
+      );
+    }
+  }, [profile]);
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Create a preview URL
     const reader = new FileReader();
     reader.onloadend = () => setPreviewImage(reader.result);
     reader.readAsDataURL(file);
 
-    setSelectedFile(file); // Store the selected file
+    setSelectedFile(file);
   };
 
-  // Trigger file input click
   const handleImageClick = () => fileInputRef.current.click();
 
-  // Handle text input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!profile) return; // Guard clause
+    
     setLoading(true);
     setError("");
 
@@ -67,7 +77,7 @@ const EditProfilePage = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: data, // Send FormData directly
+          body: data,
         }
       );
 
@@ -86,6 +96,10 @@ const EditProfilePage = () => {
     }
   };
 
+  if (!profile) {
+    return <div>Loading profile...</div>; // Or your preferred loading state
+  }
+
   return (
     <div className="edit-profile-page">
       <h1>Edit Profile</h1>
@@ -96,11 +110,13 @@ const EditProfilePage = () => {
           className="profile-photo-preview"
           onClick={handleImageClick}
           style={{
-            backgroundImage: `url(${previewImage || "/default-profile.png"})`,
+            backgroundImage: `url(${previewImage})`,
             cursor: "pointer",
           }}
         >
-          {!previewImage && <span>Click to upload photo</span>}
+          {!profile.profilePhoto && !selectedFile && (
+            <span>Click to upload photo</span>
+          )}
         </div>
         <input
           type="file"

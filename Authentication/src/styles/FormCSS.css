@@ -61,6 +61,8 @@ form {
 .btn-primary {
     background-color: #2C3E50; /* Dark blue */
     border: none;
+    text-align: center;
+    justify-content: center; /* Center text */
     padding: 10px;
     font-size: 16px;
     color: #ffffff; /* White text */
@@ -75,6 +77,8 @@ form {
 
 /* Signup link styling */
 .btn-secondary {
+    text-align: center;
+    justify-content: center; /* Center text */
     background-color: #BDC3C7; /* Silver */
     border: none;
     padding: 10px;
@@ -101,3 +105,4 @@ form {
     margin: 0; /* Reset default margin */
     margin-bottom: 10px; /* Add only bottom margin */
 }
+

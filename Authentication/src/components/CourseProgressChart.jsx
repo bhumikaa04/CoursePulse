@@ -13,7 +13,6 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import { ThemeContext } from "../context/ThemeContext";
 
 ChartJS.register(
   CategoryScale,
@@ -27,7 +26,6 @@ ChartJS.register(
 );
 
 export default function CourseProgressChart() {
-  const { theme } = useContext(ThemeContext);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -42,7 +40,7 @@ export default function CourseProgressChart() {
     );
   }
 
-  const isDarkMode = theme === "dark";
+  const isDarkMode = "dark";
 
   const progressData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],

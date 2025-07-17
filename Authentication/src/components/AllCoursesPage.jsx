@@ -6,6 +6,10 @@ import {
   FiPlus,
   FiSearch,
   FiAlertCircle,
+  FiRefreshCw,
+  FiArrowRight,
+  FiCalendar,
+  FiTag
 } from "react-icons/fi";
 import "../styles/AllCoursesPage.css";
 
@@ -51,10 +55,10 @@ const AllCoursesPage = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="all-courses-page">
+      <div className="my-courses">
         <div className="loader-container">
           <div className="spinner"></div>
-          <p>Loading your courses...</p>
+          <p className="loader-text">Loading your courses...</p>
         </div>
       </div>
     );
@@ -63,11 +67,17 @@ const AllCoursesPage = () => {
   // Error state
   if (error) {
     return (
-      <div className="all-courses-page">
+      <div className="my-courses">
         <div className="error-container">
           <FiAlertCircle className="error-icon" />
-          <h2>Error Loading Courses</h2>
+          <h2>Failed to load courses</h2>
           <p>{error}</p>
+          <button 
+            className="btn-primary"
+            onClick={() => window.location.reload()}
+          >
+            <FiRefreshCw /> Try Again
+          </button>
         </div>
       </div>
     );
@@ -76,67 +86,114 @@ const AllCoursesPage = () => {
   // Empty state
   if (!createdCourses.length && !enrolledCourses.length) {
     return (
-      <div className="all-courses-page empty-state">
-        <h2>You don't have any courses yet!</h2>
-        <div className="actions">
-          <button
-            className="btn-primary"
-            onClick={() => navigate("/create-course")}
-          >
-            <FiPlus /> Create a Course
-          </button>
-          <button
-            className="btn-secondary"
-            onClick={() => navigate("/search")}
-          >
-            <FiSearch /> Search Courses
-          </button>
+      <div className="my-courses">
+        <div className="empty-container">
+          <h2>You don't have any courses yet! 😞</h2>
+          <div className="actions">
+            <button 
+              className="btn-primary"
+              onClick={() => navigate("/create-course")}
+            >
+              <FiPlus /> Create Your First Course
+            </button>
+            <button
+              className="btn-secondary"
+              onClick={() => navigate("/search")}
+            >
+              <FiSearch /> Browse Courses
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="all-courses-page">
-      <div className="section">
-        <h2>Created Courses</h2>
-        {createdCourses.length > 0 ? (
-          <div className="courses-grid">
-            {createdCourses.map((course) => (
-              <div
-                key={course.id}
-                className="course-card"
-                onClick={() => navigate(`/course/${course.id}`)}
-              >
-                <h3>{course.title}</h3>
-                <p>{course.description}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>You haven't created any courses yet.</p>
-        )}
+    <div className="my-courses">
+      <div className="courses-header">
+        <div>
+          <h1>My Courses</h1>
+          <p>Manage your learning and teaching materials</p>
+        </div>
+        <div className="header-actions">
+          <button 
+            className="btn-primary"
+            onClick={() => navigate("/create-course")}
+          >
+            <FiPlus /> Create New Course
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => navigate("/search")}
+          >
+            <FiSearch /> Browse Courses
+          </button>
+        </div>
       </div>
 
-      <div className="section">
-        <h2>Enrolled Courses</h2>
-        {enrolledCourses.length > 0 ? (
+      {createdCourses.length > 0 && (
+        <div className="section">
+          <h2 className="section-title">Created Courses</h2>
           <div className="courses-grid">
-            {enrolledCourses.map((course) => (
-              <div
-                key={course.id}
+            {createdCourses.map((course) => (
+              <div 
+                key={course.id} 
                 className="course-card"
                 onClick={() => navigate(`/course/${course.id}`)}
               >
-                <h3>{course.title}</h3>
-                <p>{course.description}</p>
+                <div className="course-card-top">
+                  <div className="course-category">
+                    <FiTag /> {course.category || "Uncategorized"}
+                  </div>
+                  <h3>{course.title}</h3>
+                  <p className="course-description">{course.description}</p>
+                </div>
+                
+                <div className="course-card-bottom">
+                  <div className="course-date">
+                    <FiCalendar /> {new Date(course.createdAt).toLocaleDateString()}
+                  </div>
+                  <button className="btn-secondary">
+                    View Details <FiArrowRight />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
-        ) : (
-          <p>You haven't enrolled in any courses yet.</p>
-        )}
-      </div>
+        </div>
+      )}
+
+      {enrolledCourses.length > 0 && (
+        <div className="section">
+          <h2 className="section-title">Enrolled Courses</h2>
+          <div className="courses-grid">
+            {enrolledCourses.map((course) => (
+              <div 
+                key={course.id} 
+                className="course-card"
+                onClick={() => navigate(`/course/${course.id}`)}
+              >
+                <div className="course-card-top">
+                  <div className="course-category">
+                    <FiTag /> {course.category || "Uncategorized"}
+                  </div>
+                  <h3>{course.title}</h3>
+                  <p className="course-description">{course.description}</p>
+                </div>
+                
+                <div className="course-card-bottom">
+                  <div className="course-date">
+                    <FiCalendar /> {new Date(course.createdAt).toLocaleDateString()}
+                  </div>
+                  <button className="btn-secondary">
+                    View Details <FiArrowRight />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

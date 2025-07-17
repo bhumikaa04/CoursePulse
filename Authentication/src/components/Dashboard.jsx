@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate  , Link} from "react-router-dom";
-import Navbar from "./Navbar";
 import { AuthContext } from "../context/AuthContext";
 import {
   FiBook,
@@ -27,7 +26,8 @@ import RecentActivity from "./RecentActivity";
 import RecommendedCourses from "./RecommendedCourses";
 import StatCard from "./StatCard";
 import "../styles/Dashboard.css"; // Import CSS for styling
-import LogoutButton from "./Logout";
+import Sidebar from "./sidebar";
+
 
 const Dashboard = () => {
   const { profile, updateProfile, setIsLoggedIn , username} = useContext(AuthContext);
@@ -50,7 +50,7 @@ const Dashboard = () => {
     // Trigger animation when component mounts
     setAnimateStats(true);
   }, []);
-
+  
   useEffect(() => {
 
     console.log('profile in Dashboard: ' , profile); 
@@ -160,109 +160,22 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <Navbar isLoggedIn={!!user} />
-      
+
       <div className="dashboard-container">
-        {/* Sidebar */}
-        <aside className={`dashboard-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
-          <div className="sidebar-toggle" onClick={toggleSidebar}>
-            <FiMenu />
-          </div>
-          
-        <div className="sidebar-header">
-          <div className="sidebar-user">
-            <div className="user-avatar">
-              {profile?.profilePhoto ? (
-                <img 
-                  src={`http://localhost:3001${profile.profilePhoto}`} 
-                  alt="Profile"
-                  onError={(e) => {
-                    e.target.src = '/default-profile.jpg';
-                    e.target.onerror = null;
-                  }}
-                />
-              ) : (
-                <span>{user?.username?.[0].toUpperCase() || user?.email?.[0].toUpperCase()}</span>
-              )}
-            </div>
-            {!sidebarCollapsed && (
-              <div className="user-info">
-                <h3>{profile.username || user?.username || user?.email?.split("@")[0]}</h3>
-                <p>Learner</p>
-              </div>
-            )}
-          </div>
-        </div>
-          
-          <nav className="sidebar-nav">
-            <ul>
-              <li className="active">
-                <a href="/dashboard">
-                  <FiBarChart2 />
-                  {!sidebarCollapsed && <span>Dashboard</span>}
-                </a>
-              </li>
-              <li>
-                <a href="/my-courses">
-                  <FiBook />
-                  {!sidebarCollapsed && <span>My Courses</span>}
-                </a>
-              </li>
-              <li>
-                <Link 
-                   to="/create-course" >
-                  <FiPlusCircle />
-                  {!sidebarCollapsed && <span>Create Courses</span>}
-                </Link>
-              </li>
-              <li>
-                <a href="/progress">
-                  <FiTrendingUp />
-                  {!sidebarCollapsed && <span>Progress</span>}
-                </a>
-              </li>
-              <li>
-                <a href="/search">
-                  <FiSearch />
-                  {!sidebarCollapsed && <span> Search </span>}
-                </a>
-              </li>
-              <li>
-                <a href="/achievements">
-                  <FiAward />
-                  {!sidebarCollapsed && <span>Achievements</span>}
-                </a>
-              </li>
-              <li>
-                <Link to={`/profile/${username}`}>
-                  <FiUser />
-                  {!sidebarCollapsed && <span>Profile</span>}
-                </Link>
-              </li>
-              {/* <li className="sidebar-list-item">
-                <LogoutButton sidebarCollapsed={sidebarCollapsed} />
-              </li> */}
-            </ul>
-          </nav>
-          
-          {!sidebarCollapsed && (
-            <div className="sidebar-footer">
-              <p>Learning streak: {stats.learningStreak} days</p>
-              <div className="streak-progress">
-                <div 
-                  className="streak-progress-bar" 
-                  style={{ width: `${Math.min(stats.learningStreak * 10, 100)}%` }}
-                ></div>
-              </div>
-            </div>
-          )}
-        </aside>
+        <Sidebar 
+          sidebarCollapsed={sidebarCollapsed} 
+          toggleSidebar={toggleSidebar} 
+          profile={profile} 
+          user={user}  
+          setIsLoggedIn={setIsLoggedIn}
+          stats={stats} 
+        />
 
         <main className={`dashboard-main ${sidebarCollapsed ? 'expanded' : ''}`}>
           {/* Header Section */}
           <header className="dashboard-header">
             <div className="header-content">
-              <h1>Learning Dashboard</h1>
+              <h1>The Learning Dashboard</h1>
               <div className="header-actions">
                 <div className="date-info">
                   <FiCalendar className="calendar-icon" />
@@ -385,31 +298,7 @@ const Dashboard = () => {
                 </div>
                 <RecentActivity />
               </div>
-              
-              {/* <div className="quick-stats">
-                <h3>Quick Stats</h3>
-                <div className="quick-stat-item">
-                  <FiStar />
-                  <div>
-                    <p>Average Rating</p>
-                    <span>4.8/5.0</span>
-                  </div>
-                </div>
-                <div className="quick-stat-item">
-                  <FiUsers />
-                  <div>
-                    <p>Learning Buddies</p>
-                    <span>12</span>
-                  </div>
-                </div>
-                <div className="quick-stat-item">
-                  <FiBookmark />
-                  <div>
-                    <p>Saved Courses</p>
-                    <span>8</span>
-                  </div>
-                </div>
-              </div> */}
+
             </div>
           </div>
         </main>

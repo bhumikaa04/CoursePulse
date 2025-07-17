@@ -1,0 +1,255 @@
+/* src/styles/ContentForm.css */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  /* Smooth fade-in animation */
+  animation: fadeIn 0.3s ease-in-out;
+
+ &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: #fff;
+  padding: 2rem;
+  width: 500px;
+  max-width: 90vw; /* More responsive max-width */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Softer shadow */
+  border-radius: 12px; /* Rounded corners */
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem; /* Slightly more spacing */
+  max-height: 90vh;
+  overflow-y: auto;
+  /* Centering improvements */
+  position: relative;
+  margin: 0 auto;
+  /* Smooth scale animation */
+  animation: scaleIn 0.2s ease-out;
+
+ &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .modal {
+    width: 95vw;
+    padding: 1.5rem;
+  }
+}
+
+/* Header styles */
+.modal h2 {
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  color: #2d3748;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Form elements */
+.modal label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+.modal input[type="text"],
+.modal input[type="url"],
+.modal select,
+.modal textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: #f8fafc;
+}
+
+.modal input[type="text"]:focus,
+.modal input[type="url"]:focus,
+.modal select:focus,
+.modal textarea:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.modal textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* File input styling */
+.modal input[type="file"] {
+  width: 100%;
+  padding: 0.5rem 0;
+  margin-top: 0.25rem;
+}
+
+/* Button styles */
+.form-actions {
+  display: flex;
+  justify-content: flex-end; /* Align to right */
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cancel,
+.submit {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel {
+  background-color: #edf2f7;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+}
+
+.cancel:hover {
+  background-color: #e2e8f0;
+}
+
+.submit {
+  background-color: #4299e1;
+  color: white;
+  border: none;
+}
+
+.submit:hover:not(:disabled) {
+  background-color: #3182ce;
+  transform: translateY(-1px);
+}
+
+.submit:disabled {
+  background-color: #a0c4ff;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Close button (optional) */
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #718096;
+  padding: 0.5rem;
+}
+
+
+/* Content Source Toggle Styles */
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #334155;
+  font-size: 14px;
+}
+
+.input-method-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.toggle-option {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.toggle-option:hover {
+  background-color: #f1f5f9;
+}
+
+.toggle-option.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.toggle-option:first-child {
+  border-right: 1px solid #e2e8f0;
+}
+
+.toggle-option svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Active state animation */
+.toggle-option.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #1d4ed8;
+}
+
+/* Focus states for accessibility */
+.toggle-option:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .toggle-option {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .toggle-option svg {
+    width: 14px;
+    height: 14px;
+  }
+}

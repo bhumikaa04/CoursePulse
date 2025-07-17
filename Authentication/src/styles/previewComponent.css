@@ -1,0 +1,137 @@
+/* Base styles */
+.preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.preview-dialog {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.preview-thumbnail {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.preview-header-text {
+  flex: 1;
+}
+
+.preview-title {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.preview-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.preview-type-badge {
+  background-color: #e1f5fe;
+  color: #0288d1;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.preview-date {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.preview-content {
+  padding: 20px;
+  flex: 1;
+}
+
+.preview-description {
+  color: #2c3e50;  /* Deep navy blue */
+  line-height: 1.7;
+  margin: 0 0 15px 0;
+  font-size: 1rem;
+}
+.preview-actions {
+  padding: 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  border-top: 1px solid #eee;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #1976d2;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #1565c0;
+}
+
+.btn-secondary {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background-color: #e0e0e0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .preview-header {
+    flex-direction: column;
+  }
+  
+  .preview-thumbnail {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+  }
+  
+  .preview-actions {
+    justify-content: center;
+  }
+}

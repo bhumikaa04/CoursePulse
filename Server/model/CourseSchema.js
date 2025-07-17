@@ -8,12 +8,11 @@ const contentSchema = new Schema({
   },
   type: { 
     type: String, 
-    enum: ['video', 'article', 'audio' , 'document'], 
+    enum: ['video', 'article', 'audio' , 'document' , 'notes' , 'url', 'image'], 
     required: true 
   },
   url: { 
     type: String, 
-    required: true 
   },
   description: { 
     type: String 
@@ -24,7 +23,7 @@ const contentSchema = new Schema({
   createdAt: { 
     type: Date, 
     default: Date.now 
-  }
+  }, 
 });
 
 const courseSchema = new Schema({
@@ -32,6 +31,9 @@ const courseSchema = new Schema({
     type: String, 
     required: true 
   },
+  description : {
+    type: String,  
+  }, 
   ownerEmail: { 
     type: String, 
     required: true 
